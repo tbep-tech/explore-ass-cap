@@ -1,0 +1,28 @@
+---
+title: "Exploring the Assimilative Capacity of Old Tampa Bay"
+author: "Tampa Bay Estuary Program"
+date: "`r Sys.Date()`"
+format:
+  html:
+    theme: cosmo
+    code-tools: 
+      source: https://github.com/tbep-tech/explore-ass-cap/blob/main/docs/explore.qmd
+    css: styles.css
+toc: true
+lightbox: true
+execute:
+  echo: false
+  warning: false
+---
+
+```{r}
+#| include: false
+library(sf)
+library(tidyverse)
+library(here)
+library(reactable)
+library(reactablefmtr)
+library(leaflet)
+
+source(here('R/funcs.R'))
+```
