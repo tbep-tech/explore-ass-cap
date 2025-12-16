@@ -25,4 +25,139 @@ library(reactablefmtr)
 library(leaflet)
 
 source(here('R/funcs.R'))
+
+data(epcdata, package = 'tbeptools')
+load(file = here('data/epcwq.RData'))
+load(file = here('data/lddat.RData'))
+```
+
+
+```{r}
+otbmo <- tbeptools::anlz_avedat(epcdata)$mos |>
+  filter(bay_segment == 'OTB', var == 'mean_chla') |>
+  rename(chla = val) |>
+  select(-bay_segment, -var) |>
+  mutate(
+    date = make_date(yr, mo, day = 1)
+  )
+
+ldmo <- lddat |>
+  rename(
+    yr = year,
+    mo = month
+  ) |>
+  summarise(
+    tn_load = sum(tn_load),
+    .by = c(yr, mo)
+  ) |>
+  mutate(
+    date = make_date(yr, mo, day = 1)
+  )
+
+# join and create up to five month lags for tn_load
+tomod <- inner_join(otbmo, ldmo, by = c('date', 'yr', 'mo')) |>
+  mutate(
+    tn_load_lag1 = lag(tn_load, 1),
+    tn_load_lag2 = lag(tn_load, 2),
+    tn_load_lag3 = lag(tn_load, 3),
+    tn_load_lag4 = lag(tn_load, 4),
+    tn_load_lag5 = lag(tn_load, 5),
+    yrcat = ifelse(yr < 2010, 'Before 2010', '2010 and After'),
+  ) |>
+  rename(tn_load_lag0 = tn_load) |>
+  pivot_longer(
+    cols = starts_with('tn_load_lag'),
+    names_to = 'lag',
+    values_to = 'tn_load'
+  ) |>
+  mutate(
+    lag = str_remove(lag, 'tn_load_'),
+    lag = str_replace(lag, 'lag', 'Lag ')
+  )
+
+# create scatterplots of chla vs tn_load with linear fits for each lag
+pall <- ggplot(tomod, aes(x = tn_load, y = chla)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(
+    method = 'lm',
+    formula = y ~ x,
+    color = 'blue',
+    se = FALSE
+  ) +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap(~lag, ncol = 3) +
+  labs(
+    x = 'Total Nitrogen Load (kg/month)',
+    y = 'Chlorophyll-a (µg/L)',
+    title = 'Relationship between Chlorophyll-a and Total Nitrogen Load in Old Tampa Bay',
+    subtitle = 'Using Monthly Average Data'
+  ) +
+  theme_minimal()
+
+# repeat and use patchwork for pre/post
+pall
+
+```
+
+```{r}
+mod <- tomod |>
+  group_nest(lag) |>
+  mutate(
+    model = map(data, function(x) {
+      modall <- lm(log10(chla) ~ log10(tn_load), data = x)
+      modpre <- lm(
+        log10(chla) ~ log10(tn_load),
+        data = x[x$yrcat == 'Before 2010', ]
+      )
+      modpos <- lm(
+        log10(chla) ~ log10(tn_load),
+        data = x[x$yrcat == '2010 and After', ]
+      )
+
+      # get rsq for all
+      rsqall <- summary(modall)$r.squared
+      rsqpre <- summary(modpre)$r.squared
+      rsqpos <- summary(modpos)$r.squared
+
+      tibble(
+        rsqall = rsqall,
+        rsqpre = rsqpre,
+        rsqpos = rsqpos
+      )
+    })
+  ) |>
+  select(-data) |>
+  unnest(model) |>
+  pivot_longer(
+    cols = starts_with('rsq'),
+    names_to = 'period',
+    values_to = 'rsq'
+  ) |>
+  mutate(
+    lag = str_remove(lag, 'Lag '),
+    period = case_when(
+      period == 'rsqall' ~ 'All Years',
+      period == 'rsqpre' ~ 'Before 2010',
+      period == 'rsqpos' ~ '2010 and After'
+    ),
+    period = factor(
+      period,
+      levels = c('All Years', 'Before 2010', '2010 and After')
+    )
+  )
+
+ggplot(mod, aes(x = as.numeric(lag), y = rsq, color = period)) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = 0:5) +
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(
+    x = 'Lag in Months',
+    y = expression(R^2),
+    color = 'Period',
+    title = 'Relationship between Chlorophyll-a and Total Nitrogen Load in Old Tampa Bay',
+    subtitle = 'Using Monthly Average Data'
+  ) +
+  theme_minimal()
 ```
