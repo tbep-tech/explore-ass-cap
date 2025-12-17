@@ -32,7 +32,6 @@ load(file = here('data/epcwq.RData'))
 load(file = here('data/lddat.RData'))
 ```
 
-
 ```{r}
 otbmo <- tbeptools::anlz_avedat(epcdata)$mos |>
   filter(bay_segment == 'OTB', var == 'mean_chla') |>
@@ -66,7 +65,38 @@ tomod <- inner_join(otbmo, ldmo, by = c('date', 'yr', 'mo')) |>
     tn_load_lag6 = lag(tn_load, 6),
     yrcat = ifelse(yr < 2010, 'Before 2010', '2010 and After'),
   ) |>
-  rename(tn_load_lag0 = tn_load) |>
+  rename(tn_load_lag0 = tn_load)
+
+toplo <- tomod
+
+p1 <- ggplot(toplo, aes(x = date, y = chla)) +
+  geom_line(color = '#00BFC4') +
+  labs(
+    x = NULL,
+    y = 'Chlorophyll-a (µg/L)',
+    title = 'Observed Chlorophyll-a and TN Load',
+    subtitle = '1995 to 2024'
+  ) +
+  theme_minimal()
+p2 <- ggplot(toplo, aes(x = date, y = tn_load_lag0 / 10)) +
+  geom_line(color = '#F8766D') +
+  labs(
+    x = NULL,
+    y = 'TN Load (0.1 x tons/month)',
+    subtitle = '1995 to 2024'
+  ) +
+  theme_minimal()
+p1 + p2 + plot_layout(ncol = 1)
+```
+
+## Chlorophyll vs Nitrogen Load 
+
+::: {.panel-tabset}
+
+### Individual Lags
+
+```{r}
+tomodind <- tomod |>
   pivot_longer(
     cols = starts_with('tn_load_lag'),
     names_to = 'lag',
@@ -78,7 +108,7 @@ tomod <- inner_join(otbmo, ldmo, by = c('date', 'yr', 'mo')) |>
   )
 
 # create scatterplots of chla vs tn_load with linear fits for each lag
-pall <- ggplot(tomod, aes(x = tn_load / 10, y = chla)) +
+pall <- ggplot(tomodind, aes(x = tn_load / 10, y = chla)) +
   geom_point(alpha = 0.5, size = 0.5) +
   geom_smooth(
     method = 'lm',
@@ -98,7 +128,7 @@ pall <- ggplot(tomod, aes(x = tn_load / 10, y = chla)) +
   theme_minimal()
 
 ppre <- ggplot(
-  tomod[tomod$yrcat %in% 'Before 2010', ],
+  tomodind[tomodind$yrcat %in% 'Before 2010', ],
   aes(x = tn_load / 10, y = chla)
 ) +
   geom_point(alpha = 0.5, size = 0.5) +
@@ -119,7 +149,7 @@ ppre <- ggplot(
   theme_minimal()
 
 ppos <- ggplot(
-  tomod[tomod$yrcat %in% '2010 and After', ],
+  tomodind[tomodind$yrcat %in% '2010 and After', ],
   aes(x = tn_load / 10, y = chla)
 ) +
   geom_point(alpha = 0.5, size = 0.5) +
@@ -143,7 +173,7 @@ pall + ppre + ppos + plot_layout(ncol = 1, axis_titles = 'collect')
 ```
 
 ```{r}
-mod <- tomod |>
+mod <- tomodind |>
   group_nest(lag) |>
   mutate(
     model = map(data, function(x) {
@@ -202,3 +232,257 @@ ggplot(mod, aes(x = as.numeric(lag), y = rsq, color = period)) +
   theme_minimal() +
   theme(legend.position = 'bottom')
 ```
+
+### Additive Lags
+
+```{r}
+tomodadd <- tomod |>
+  mutate(
+    tn_load_lag1 = rowSums(pick(tn_load_lag0:tn_load_lag1), na.rm = FALSE),
+    tn_load_lag2 = rowSums(pick(tn_load_lag0:tn_load_lag2), na.rm = FALSE),
+    tn_load_lag3 = rowSums(pick(tn_load_lag0:tn_load_lag3), na.rm = FALSE),
+    tn_load_lag4 = rowSums(pick(tn_load_lag0:tn_load_lag4), na.rm = FALSE),
+    tn_load_lag5 = rowSums(pick(tn_load_lag0:tn_load_lag5), na.rm = FALSE),
+    tn_load_lag6 = rowSums(pick(tn_load_lag0:tn_load_lag6), na.rm = FALSE)
+  ) |>
+  pivot_longer(
+    cols = starts_with('tn_load_lag'),
+    names_to = 'lag',
+    values_to = 'tn_load'
+  ) |>
+  mutate(
+    lag = str_remove(lag, 'tn_load_'),
+    lag = str_replace(lag, 'lag', 'Lag ')
+  )
+
+# create scatterplots of chla vs tn_load with linear fits for each lag
+pall <- ggplot(tomodadd, aes(x = tn_load / 10, y = chla)) +
+  geom_point(alpha = 0.5, size = 0.5) +
+  geom_smooth(
+    method = 'lm',
+    formula = y ~ x,
+    color = '#F8766D',
+    se = T
+  ) +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap(~lag, ncol = 7, scales = 'free_x') +
+  labs(
+    x = 'Total Nitrogen Load (0.01 x tons/month)',
+    y = 'Chlorophyll-a (µg/L)',
+    title = 'Monthly Relationship between Chlorophyll-a and Total Nitrogen',
+    subtitle = '1995 to 2024'
+  ) +
+  theme_minimal()
+
+ppre <- ggplot(
+  tomodadd[tomodadd$yrcat %in% 'Before 2010', ],
+  aes(x = tn_load / 10, y = chla)
+) +
+  geom_point(alpha = 0.5, size = 0.5) +
+  geom_smooth(
+    method = 'lm',
+    formula = y ~ x,
+    color = '#00BA38',
+    se = T
+  ) +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap(~lag, ncol = 7, scales = 'free_x') +
+  labs(
+    x = 'Total Nitrogen Load (0.01 x tons/month)',
+    y = 'Chlorophyll-a (µg/L)',
+    subtitle = 'Before 2010'
+  ) +
+  theme_minimal()
+
+ppos <- ggplot(
+  tomodadd[tomodadd$yrcat %in% '2010 and After', ],
+  aes(x = tn_load / 10, y = chla)
+) +
+  geom_point(alpha = 0.5, size = 0.5) +
+  geom_smooth(
+    method = 'lm',
+    formula = y ~ x,
+    color = '#619CFF',
+    se = T
+  ) +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap(~lag, ncol = 7, scales = 'free_x') +
+  labs(
+    x = 'Total Nitrogen Load (0.01 x tons/month)',
+    y = 'Chlorophyll-a (µg/L)',
+    subtitle = '2010 and After'
+  ) +
+  theme_minimal()
+
+padd <- pall + ppre + ppos + plot_layout(ncol = 1, axis_titles = 'collect')
+padd
+```
+
+```{r}
+mod <- tomodadd |>
+  group_nest(lag) |>
+  mutate(
+    model = map(data, function(x) {
+      modall <- lm(log10(chla) ~ log10(tn_load), data = x)
+      modpre <- lm(
+        log10(chla) ~ log10(tn_load),
+        data = x[x$yrcat == 'Before 2010', ]
+      )
+      modpos <- lm(
+        log10(chla) ~ log10(tn_load),
+        data = x[x$yrcat == '2010 and After', ]
+      )
+
+      # get rsq for all
+      rsqall <- summary(modall)$r.squared
+      rsqpre <- summary(modpre)$r.squared
+      rsqpos <- summary(modpos)$r.squared
+
+      tibble(
+        rsqall = rsqall,
+        rsqpre = rsqpre,
+        rsqpos = rsqpos
+      )
+    })
+  ) |>
+  select(-data) |>
+  unnest(model) |>
+  pivot_longer(
+    cols = starts_with('rsq'),
+    names_to = 'period',
+    values_to = 'rsq'
+  ) |>
+  mutate(
+    lag = str_remove(lag, 'Lag '),
+    period = case_when(
+      period == 'rsqall' ~ '1995 to 2024',
+      period == 'rsqpre' ~ 'Before 2010',
+      period == 'rsqpos' ~ '2010 and After'
+    ),
+    period = factor(
+      period,
+      levels = c('1995 to 2024', 'Before 2010', '2010 and After')
+    )
+  )
+
+ggplot(mod, aes(x = as.numeric(lag), y = rsq, color = period)) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = 0:6) +
+  labs(
+    x = 'Lag in Months',
+    y = expression(R^2),
+    color = 'Period',
+    title = 'Model fits (R²) by Lag Time and Period'
+  ) +
+  theme_minimal() +
+  theme(legend.position = 'bottom')
+```
+
+### Additive Lags Plus Month
+
+```{r}
+padd
+```
+
+```{r}
+mod <- tomodadd |>
+  group_nest(lag) |>
+  mutate(
+    model = map(data, function(x) {
+      modall <- lm(log10(chla) ~ factor(mo) + log10(tn_load), data = x)
+      modpre <- lm(
+        log10(chla) ~ factor(mo) + log10(tn_load),
+        data = x[x$yrcat == 'Before 2010', ]
+      )
+      modpos <- lm(
+        log10(chla) ~ factor(mo) + log10(tn_load),
+        data = x[x$yrcat == '2010 and After', ]
+      )
+
+      # get rsq for all
+      rsqall <- summary(modall)$r.squared
+      rsqpre <- summary(modpre)$r.squared
+      rsqpos <- summary(modpos)$r.squared
+
+      tibble(
+        rsqall = rsqall,
+        rsqpre = rsqpre,
+        rsqpos = rsqpos
+      )
+    })
+  ) |>
+  select(-data) |>
+  unnest(model) |>
+  pivot_longer(
+    cols = starts_with('rsq'),
+    names_to = 'period',
+    values_to = 'rsq'
+  ) |>
+  mutate(
+    lag = str_remove(lag, 'Lag '),
+    period = case_when(
+      period == 'rsqall' ~ '1995 to 2024',
+      period == 'rsqpre' ~ 'Before 2010',
+      period == 'rsqpos' ~ '2010 and After'
+    ),
+    period = factor(
+      period,
+      levels = c('1995 to 2024', 'Before 2010', '2010 and After')
+    )
+  )
+
+ggplot(mod, aes(x = as.numeric(lag), y = rsq, color = period)) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = 0:6) +
+  labs(
+    x = 'Lag in Months',
+    y = expression(R^2),
+    color = 'Period',
+    title = 'Model fits (R²) by Lag Time and Period'
+  ) +
+  theme_minimal() +
+  theme(legend.position = 'bottom')
+```
+
+:::
+
+## Best fitting model
+
+```{r}
+
+tomod1 <- tomodadd |>
+  filter(lag %in% c('Lag 0', 'Lag 1', 'Lag 2', 'Lag 3')) |>
+  pivot_wider(
+    names_from = lag,
+    values_from = tn_load
+  )
+
+modbest <- lm(
+  log10(chla) ~ log10(`Lag 3`),
+  data = tomod1,
+  na.action = na.exclude
+)
+
+toplo <- tomod1 |>
+  mutate(
+    pred_best = 10^predict(modbest)
+  )
+ggplot(toplo, aes(x = date, y = chla)) +
+  geom_point() +
+  geom_line(aes(y = pred_best), color = '#F8766D') +
+  scale_y_log10() +
+  theme_minimal() +
+  theme(legend.position = 'bottom') +
+  labs(
+    x = NULL,
+    y = 'Chlorophyll-a (µg/L)',
+    title = 'Observed vs Predicted Chlorophyll-a',
+    subtitle = 'Using Best Fit Model'
+  )
+```
+
