@@ -119,7 +119,7 @@ window.Quarto = {
   <ul>
   <li><a href="#original-model-all-bay-segments" id="toc-original-model-all-bay-segments" class="nav-link active" data-scroll-target="#original-model-all-bay-segments">Original Model, All Bay Segments</a></li>
   <li><a href="#otb-only-model" id="toc-otb-only-model" class="nav-link" data-scroll-target="#otb-only-model">OTB Only Model</a></li>
-  <li><a href="#cumulative-lagged-model-to-predict-9.3-mugl-chl-a-threshold" id="toc-cumulative-lagged-model-to-predict-9.3-mugl-chl-a-threshold" class="nav-link" data-scroll-target="#cumulative-lagged-model-to-predict-9.3-mugl-chl-a-threshold">Cumulative Lagged Model to Predict 9.3 <span class="math inline">\(\mu\)</span>g/L Chl-a Threshold</a></li>
+  <li><a href="#assimilative-capacity-analysis" id="toc-assimilative-capacity-analysis" class="nav-link" data-scroll-target="#assimilative-capacity-analysis">Assimilative Capacity Analysis</a></li>
   </ul>
 </nav>
 </div>
@@ -279,8 +279,9 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="cumulative-lagged-model-to-predict-9.3-mugl-chl-a-threshold" class="level2">
-<h2 class="anchored" data-anchor-id="cumulative-lagged-model-to-predict-9.3-mugl-chl-a-threshold">Cumulative Lagged Model to Predict 9.3 <span class="math inline">\(\mu\)</span>g/L Chl-a Threshold</h2>
+<section id="assimilative-capacity-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="assimilative-capacity-analysis">Assimilative Capacity Analysis</h2>
+<p>The cumulative lag model with a 3-month lag was chosen for the assimilative capacity analysis based on the results above and previous work by Janicki and Wade (1996). Separate models were used for the periods before and after 2010 to account for potential changes in factors driving chlorophyll-a concentration over time.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -290,11 +291,56 @@ window.Quarto = {
 </div>
 </div>
 </div>
+<p>The annual average observed and predicted chlorophyll-a concentrations are compared to the target of 9.3 µg/L for Old Tampa Bay below.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><a href="explore_files/figure-html/unnamed-chunk-13-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="explore_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The assimilative capacity analysis involves simulating various nitrogen load reduction scenarios and predicting the resulting chlorophyll-a concentrations using the developed models. Monthly loads are reduced by fractions ranging from 0% to 100% in 5% increments. The models are then used to predict chlorophyll-a concentrations under each load reduction scenario for both time periods (before and after 2010).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-14-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="explore_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-14-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="explore_files/figure-html/unnamed-chunk-14-2.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Monthly model predictions are then aggregated to annual average predicted chlorophyll-a and total nitrogen loads for each load reduction scenario.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-15-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="explore_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-15-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="explore_files/figure-html/unnamed-chunk-15-2.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The average response of chlorophyll-a to nitrogen load changes was then estimated for each time period by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario. The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario. The dashed red line indicates the target chlorophyll-a concentration of 9.3 µg/L. The arrows indicate the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration for each time period based on linear interpolation of the average response curves.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-16-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="explore_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>

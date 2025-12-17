@@ -438,7 +438,9 @@ rsqplo_fun(mod)
 
 :::
 
-## Cumulative Lagged Model to Predict 9.3 $\mu$g/L Chl-a Threshold
+## Assimilative Capacity Analysis
+
+The cumulative lag model with a 3-month lag was chosen for the assimilative capacity analysis based on the results above and previous work by Janicki and Wade (1996). Separate models were used for the periods before and after 2010 to account for potential changes in factors driving chlorophyll-a concentration over time.
 
 ```{r}
 toprdaddotb <- tomodaddotb |>
@@ -473,12 +475,14 @@ ggplot(toplo, aes(x = date, y = chla)) +
     legend.position = 'bottom'
   ) +
   labs(
-    title = 'Observed and Predicted Chlorophyll-a in Old Tampa Bay',
-    y = 'Chlorophyll-a (µg/L)',
+    title = 'Monthly Observed and Predicted Chlorophyll-a in Old Tampa Bay',
+    y = 'µg/L',
     x = NULL,
-    color = 'Period'
+    color = 'Model'
   )
 ```
+
+The annual average observed and predicted chlorophyll-a concentrations are compared to the target of 9.3 µg/L for Old Tampa Bay below.
 
 ```{r}
 annavg <- tbeptools::anlz_avedat(epcdata)$ann |>
@@ -516,9 +520,225 @@ ggplot(annavg, aes(x = yr, y = val)) +
   guides(color = guide_legend(override.aes = list(shape = NA))) +
   labs(
     title = 'Annual Average Observed and Predicted Chlorophyll-a in Old Tampa Bay',
-    y = 'Annual Average Chlorophyll-a (µg/L)',
+    y = 'µg/L',
     x = 'Year',
     shape = 'Meets 9.3 µg/L Target',
     color = NULL
+  )
+```
+
+The assimilative capacity analysis involves simulating various nitrogen load reduction scenarios and predicting the resulting chlorophyll-a concentrations using the developed models. Monthly loads are reduced by fractions ranging from 0% to 100% in 5% increments. The models are then used to predict chlorophyll-a concentrations under each load reduction scenario for both time periods (before and after 2010).
+
+```{r}
+# load reduction scenarios
+
+redscn <- crossing(
+  redscn = seq(0, 1, by = 0.05),
+  lddat |>
+    mutate(yrcat = ifelse(yr < 2010, 'Before 2010', '2010 and After')) |>
+    filter(bay_segment %in% 'OTB')
+) |>
+  group_nest(redscn, yrcat) |>
+  mutate(
+    yrcat = factor(
+      yrcat,
+      levels = c('Before 2010', '2010 and After')
+    ),
+    data = pmap(list(redscn, data), function(red, dat) {
+      dat |>
+        mutate(
+          tn_load_lag0 = tn_load * red,
+          tn_load_lag1 = lag(tn_load_lag0, 1),
+          tn_load_lag2 = lag(tn_load_lag0, 2),
+          tn_load_lag3 = lag(tn_load_lag0, 3)
+        ) |>
+        mutate(
+          tn_load_lag1 = rowSums(
+            pick(tn_load_lag0:tn_load_lag1),
+            na.rm = FALSE
+          ),
+          tn_load_lag2 = rowSums(
+            pick(tn_load_lag0:tn_load_lag2),
+            na.rm = FALSE
+          ),
+          tn_load_lag3 = rowSums(pick(tn_load_lag0:tn_load_lag3), na.rm = FALSE)
+        ) |>
+        rename(`Lag 3` = tn_load_lag3)
+    }),
+    data = map2(data, yrcat, function(dat, yrc) {
+      mod <- toprdaddotb |> filter(yrcat == yrc) |> pull(model)
+      prd <- predict(
+        mod[[1]],
+        newdata = dat,
+      )
+      bind_cols(dat, tibble(predchla = prd))
+    }),
+    annavg = map(data, function(dat) {
+      dat |>
+        summarize(
+          tn_load = sum(tn_load_lag0, na.rm = TRUE),
+          predchla = mean(predchla, na.rm = TRUE),
+          .by = yr
+        )
+    })
+  )
+
+toplo <- redscn |>
+  select(redscn, yrcat, data) |>
+  unnest(data)
+
+ggplot(toplo, aes(x = date, y = tn_load_lag0)) +
+  geom_line(aes(group = redscn, color = redscn)) +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'D') +
+  facet_wrap(~yrcat, ncol = 1, scales = 'free_x') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Monthly Load Reduction Scenarios',
+    y = 'tons/month',
+    x = NULL
+  )
+
+ggplot(toplo, aes(x = date, y = predchla)) +
+  geom_line(aes(group = redscn, color = redscn)) +
+  geom_hline(yintercept = 9.3, linetype = 'dashed', color = 'red') +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'C') +
+  facet_wrap(~yrcat, ncol = 1, scales = 'free_x') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Monthly Predicted Chlorophyll-a Under Load Reduction Scenarios',
+    y = 'µg/L',
+    x = NULL
+  )
+```
+
+Monthly  model predictions are then aggregated to annual average predicted chlorophyll-a and total nitrogen loads for each load reduction scenario.
+
+```{r}
+toplo2 <- redscn |>
+  select(redscn, yrcat, annavg) |>
+  unnest(annavg)
+
+ggplot(toplo2, aes(x = yr, y = tn_load, group = redscn)) +
+  geom_line(aes(color = redscn)) +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'D') +
+  facet_wrap(~yrcat, ncol = 1, scales = 'free_x') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Annual Total Nitrogen Loads from Monthly Reduction Scenarios',
+    y = 'tons/year',
+    x = NULL
+  )
+
+ggplot(toplo2, aes(x = yr, y = predchla, group = redscn)) +
+  geom_line(aes(color = redscn)) +
+  geom_hline(yintercept = 9.3, linetype = 'dashed', color = 'red') +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'C') +
+  facet_wrap(~yrcat, ncol = 1, scales = 'free_x') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Annual Average Predicted Chlorophyll-a Under Load Reduction Scenarios',
+    y = 'µg/L',
+    x = NULL
+  )
+```
+
+The average response of chlorophyll-a to nitrogen load changes was then estimated for each time period by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario.  The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 9.3 µg/L.  The arrows indicate the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration for each time period based on linear interpolation of the average response curves.
+
+```{r}
+toplo3 <- toplo2 |>
+  summarise(
+    avechl = mean(predchla, na.rm = TRUE),
+    hichl = t.test(predchla)$conf.int[2],
+    locl = t.test(predchla)$conf.int[1],
+    tn_load = mean(tn_load, na.rm = TRUE),
+    .by = c(redscn, yrcat)
+  )
+
+# get the x-axis load values for 9.3 ug/L chl-a
+befass <- lm(
+  avechl ~ tn_load,
+  data = toplo3[toplo3$yrcat %in% 'Before 2010', ]
+) |>
+  coefficients()
+aftass <- lm(
+  avechl ~ tn_load,
+  data = toplo3[toplo3$yrcat %in% '2010 and After', ]
+) |>
+  coefficients()
+befass <- (9.3 - befass[1]) / befass[2]
+aftass <- (9.3 - aftass[1]) / aftass[2]
+
+addlns <- tibble(
+  avechl = 9.3,
+  yrcat = factor(
+    c('Before 2010', '2010 and After'),
+    levels = c('Before 2010', '2010 and After')
+  ),
+  tn_load = c(befass, aftass)
+)
+
+ggplot(toplo3, aes(x = tn_load, y = avechl)) +
+  geom_line(aes(color = yrcat)) +
+  geom_point(aes(color = yrcat)) +
+  geom_segment(
+    data = addlns,
+    aes(
+      x = tn_load,
+      y = avechl,
+      xend = tn_load,
+      yend = 0,
+      color = yrcat
+    ),
+    arrow = arrow(length = unit(0.6, "cm")),
+    linetype = 'solid',
+  ) +
+  geom_text(
+    data = addlns,
+    aes(
+      x = tn_load,
+      y = 0,
+      label = paste0(
+        'Estimated load at 9.3 µg/L: ',
+        round(tn_load, 0),
+        ' tons/yr'
+      ),
+      color = yrcat
+    ),
+    hjust = 1.05,
+    vjust = 0,
+    size = 3,
+    fontface = 'bold'
+  ) +
+  geom_ribbon(
+    aes(
+      ymin = locl,
+      ymax = hichl,
+      fill = yrcat
+    ),
+    alpha = 0.2,
+    color = NA
+  ) +
+  geom_hline(yintercept = 9.3, linetype = 'dashed', color = 'red') +
+  facet_wrap(~yrcat) +
+  theme_minimal() +
+  theme(
+    legend.position = 'none'
+  ) +
+  labs(
+    title = 'Average Predicted Chlorophyll-a vs. Nitrogen Load in Old Tampa Bay Under Load Reduction Scenarios',
+    y = 'µg/L',
+    x = 'Average TN Load (tons/yr)',
   )
 ```
