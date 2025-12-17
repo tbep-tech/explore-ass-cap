@@ -22,6 +22,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -41,6 +76,35 @@ ul.task-list li input[type="checkbox"] {
 <link href="explore_files/libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="explore_files/libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -53,8 +117,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#chlorophyll-vs-nitrogen-load" id="toc-chlorophyll-vs-nitrogen-load" class="nav-link active" data-scroll-target="#chlorophyll-vs-nitrogen-load">Chlorophyll vs Nitrogen Load</a></li>
-  <li><a href="#best-fitting-model" id="toc-best-fitting-model" class="nav-link" data-scroll-target="#best-fitting-model">Best fitting model</a></li>
+  <li><a href="#original-model-all-bay-segments" id="toc-original-model-all-bay-segments" class="nav-link active" data-scroll-target="#original-model-all-bay-segments">Original Model, All Bay Segments</a></li>
+  <li><a href="#otb-only-model" id="toc-otb-only-model" class="nav-link" data-scroll-target="#otb-only-model">OTB Only Model</a></li>
   </ul>
 </nav>
 </div>
@@ -91,26 +155,30 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="original-model-all-bay-segments" class="level2">
+<h2 class="anchored" data-anchor-id="original-model-all-bay-segments">Original Model, All Bay Segments</h2>
+<p>The cumulative lag model from <a href="https://drive.google.com/file/d/1kZkvuprvsMyN9nPS5PHYvXHyo1KQxKTr/view">Janicki and Wade 1996</a> is specified as:</p>
+<p><span class="math display">\[
+\text{chla}_{t, s} = \alpha_{t, s} + \beta_s \left( \Sigma_{t = 0}^{n} L_{t, s} \right)
+\]</span></p>
+<p>where <span class="math inline">\(\text{chla}_{t, s}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span> and bay segment <span class="math inline">\(s\)</span>, <span class="math inline">\(\alpha_{t, s}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span> and <span class="math inline">\(s\)</span>, <span class="math inline">\(\beta_s\)</span> is the coefficient for the cumulative load term that varies by <span class="math inline">\(s\)</span>, and <span class="math inline">\(L_{t, s}\)</span> is the cumulative nitrogen nitrogen load evaluated at different lags from 0 to <span class="math inline">\(n\)</span> months for each <span class="math inline">\(s\)</span>.</p>
+<p>The individaul lag model is specified as: <span class="math display">\[
+\text{chla}_{t, s} = \alpha_{t, s} + \beta_s L_{n, s}
+\]</span></p>
+<p>where <span class="math inline">\(\text{chla}_{t, s}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span> and bay segment <span class="math inline">\(s\)</span>, <span class="math inline">\(\alpha_{t, s}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span> and <span class="math inline">\(s\)</span>, <span class="math inline">\(\beta_s\)</span> is the coefficient for the individual load term that varies by <span class="math inline">\(s\)</span>, and <span class="math inline">\(L_{t, s}\)</span> is the individual nitrogen load evaluated at different monthly <span class="math inline">\(n\)</span> lags for each <span class="math inline">\(s\)</span>.</p>
+<p>Both models are run with the following linear model structure in R, where the <code>tn_load</code> variable is either the cumulative or individual lag load for different <span class="math inline">\(n\)</span> lags.</p>
 <div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-2-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="explore_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></a></p>
-</figure>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>chla <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> <span class="fu">factor</span>(bay_segment)<span class="sc">:</span><span class="fu">factor</span>(mo) <span class="sc">+</span> tn_load<span class="sc">:</span><span class="fu">factor</span>(bay_segment)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</div>
-</div>
-<section id="chlorophyll-vs-nitrogen-load" class="level2">
-<h2 class="anchored" data-anchor-id="chlorophyll-vs-nitrogen-load">Chlorophyll vs Nitrogen Load</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Individual Lags</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Additive Lags</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Additive Lags Plus Month</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Cumulative Lags</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Individual Lags</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-3-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="explore_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></a></p>
+<p><a href="explore_files/figure-html/unnamed-chunk-3-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="explore_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -119,7 +187,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-4-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="explore_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></a></p>
+<p><a href="explore_files/figure-html/unnamed-chunk-4-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="explore_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -130,7 +198,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-5-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="explore_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></a></p>
+<p><a href="explore_files/figure-html/unnamed-chunk-5-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="explore_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -139,27 +207,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-6-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="explore_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></a></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-7-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="explore_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-8-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="explore_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></a></p>
+<p><a href="explore_files/figure-html/unnamed-chunk-6-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="explore_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -168,14 +216,64 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </section>
-<section id="best-fitting-model" class="level2">
-<h2 class="anchored" data-anchor-id="best-fitting-model">Best fitting model</h2>
+<section id="otb-only-model" class="level2">
+<h2 class="anchored" data-anchor-id="otb-only-model">OTB Only Model</h2>
+<p>The models are the same as above except the bay segment term is removed since only OTB is being modeled.</p>
+<p>The cumulative lag model from is specified as:</p>
+<p><span class="math display">\[
+\text{chla}_{t} = \alpha_{t} + \beta \left( \Sigma_{t = 0}^{n} L_{t} \right)
+\]</span></p>
+<p>where <span class="math inline">\(\text{chla}_{t}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span>, <span class="math inline">\(\alpha_{t}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span>, <span class="math inline">\(\beta\)</span> is the coefficient for the cumulative load term, and <span class="math inline">\(L_{t}\)</span> is the cumulative nitrogen load evaluated at different lags from 0 to <span class="math inline">\(n\)</span> months.</p>
+<p>The individaul lag model is specified as: <span class="math display">\[
+\text{chla}_{t, s} = \alpha_{t, s} + \beta_s L_{n, s}
+\]</span></p>
+<p>where <span class="math inline">\(\text{chla}_{t}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span>, <span class="math inline">\(\alpha_{t}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span>, <span class="math inline">\(\beta\)</span> is the coefficient for the individual load term, and <span class="math inline">\(L_{t}\)</span> is the individual nitrogen load evaluated at different monthly <span class="math inline">\(n\)</span> lags.</p>
+<p>Both models are run with the following linear model structure in R, where the <code>tn_load</code> variable is either the cumulative or individual lag load for different <span class="math inline">\(n\)</span> lags.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>chla <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> <span class="fu">factor</span>(mo) <span class="sc">+</span> tn_load</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Cumulative Lags</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Individual Lags</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-9-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="explore_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></a></p>
+<p><a href="explore_files/figure-html/unnamed-chunk-8-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="explore_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-9-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="explore_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-10-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="explore_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-11-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="explore_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>

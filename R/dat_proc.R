@@ -1,16 +1,7 @@
 library(tidyverse)
-library(tbeptools)
 library(here)
 
 source(here('R/funcs.R'))
-
-# get water quality data from epc ----------------------------------------
-
-epcwq <- epcdata |>
-  filter(bay_segment == 'OTB') |>
-  select(-bay_segment)
-
-save(epcwq, file = here('data/epcwq.RData'))
 
 # get loading data -------------------------------------------------------
 
@@ -19,8 +10,34 @@ mosdatraw <- rdataload(
 )
 
 lddat <- mosdatraw |>
-  filter(bay_segment == 'Old Tampa Bay') |>
-  select(-bay_segment)
+  filter(
+    bay_segment %in%
+      c(
+        'Old Tampa Bay',
+        'Hillsborough Bay',
+        'Middle Tampa Bay',
+        'Lower Tampa Bay'
+      )
+  ) |>
+  mutate(
+    bay_segment = case_when(
+      bay_segment == 'Old Tampa Bay' ~ 'OTB',
+      bay_segment == 'Hillsborough Bay' ~ 'HB',
+      bay_segment == 'Middle Tampa Bay' ~ 'MTB',
+      bay_segment == 'Lower Tampa Bay' ~ 'LTB'
+    )
+  ) |>
+  summarise(
+    tn_load = sum(tn_load, na.rm = TRUE),
+    .by = c(year, month, bay_segment)
+  ) |>
+  rename(
+    yr = year,
+    mo = month
+  ) |>
+  mutate(
+    date = make_date(yr, mo, 1)
+  )
 
 save(lddat, file = here('data/lddat.RData'))
 
