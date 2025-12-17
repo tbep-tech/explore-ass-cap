@@ -23,6 +23,7 @@ library(here)
 library(reactable)
 library(reactablefmtr)
 library(leaflet)
+library(patchwork)
 
 source(here('R/funcs.R'))
 
@@ -62,6 +63,7 @@ tomod <- inner_join(otbmo, ldmo, by = c('date', 'yr', 'mo')) |>
     tn_load_lag3 = lag(tn_load, 3),
     tn_load_lag4 = lag(tn_load, 4),
     tn_load_lag5 = lag(tn_load, 5),
+    tn_load_lag6 = lag(tn_load, 6),
     yrcat = ifelse(yr < 2010, 'Before 2010', '2010 and After'),
   ) |>
   rename(tn_load_lag0 = tn_load) |>
@@ -76,28 +78,68 @@ tomod <- inner_join(otbmo, ldmo, by = c('date', 'yr', 'mo')) |>
   )
 
 # create scatterplots of chla vs tn_load with linear fits for each lag
-pall <- ggplot(tomod, aes(x = tn_load, y = chla)) +
-  geom_point(alpha = 0.5) +
+pall <- ggplot(tomod, aes(x = tn_load / 10, y = chla)) +
+  geom_point(alpha = 0.5, size = 0.5) +
   geom_smooth(
     method = 'lm',
     formula = y ~ x,
-    color = 'blue',
-    se = FALSE
+    color = '#F8766D',
+    se = T
   ) +
   scale_x_log10() +
   scale_y_log10() +
-  facet_wrap(~lag, ncol = 3) +
+  facet_wrap(~lag, ncol = 7) +
   labs(
-    x = 'Total Nitrogen Load (kg/month)',
+    x = 'Total Nitrogen Load (0.1 x tons/month)',
     y = 'Chlorophyll-a (µg/L)',
-    title = 'Relationship between Chlorophyll-a and Total Nitrogen Load in Old Tampa Bay',
-    subtitle = 'Using Monthly Average Data'
+    title = 'Monthly Relationship between Chlorophyll-a and Total Nitrogen',
+    subtitle = '1995 to 2024'
   ) +
   theme_minimal()
 
-# repeat and use patchwork for pre/post
-pall
+ppre <- ggplot(
+  tomod[tomod$yrcat %in% 'Before 2010', ],
+  aes(x = tn_load / 10, y = chla)
+) +
+  geom_point(alpha = 0.5, size = 0.5) +
+  geom_smooth(
+    method = 'lm',
+    formula = y ~ x,
+    color = '#00BA38',
+    se = T
+  ) +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap(~lag, ncol = 7) +
+  labs(
+    x = 'Total Nitrogen Load (0.1 x tons/month)',
+    y = 'Chlorophyll-a (µg/L)',
+    subtitle = 'Before 2010'
+  ) +
+  theme_minimal()
 
+ppos <- ggplot(
+  tomod[tomod$yrcat %in% '2010 and After', ],
+  aes(x = tn_load / 10, y = chla)
+) +
+  geom_point(alpha = 0.5, size = 0.5) +
+  geom_smooth(
+    method = 'lm',
+    formula = y ~ x,
+    color = '#619CFF',
+    se = T
+  ) +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap(~lag, ncol = 7) +
+  labs(
+    x = 'Total Nitrogen Load (0.1 x tons/month)',
+    y = 'Chlorophyll-a (µg/L)',
+    subtitle = '2010 and After'
+  ) +
+  theme_minimal()
+
+pall + ppre + ppos + plot_layout(ncol = 1, axis_titles = 'collect')
 ```
 
 ```{r}
@@ -137,27 +179,26 @@ mod <- tomod |>
   mutate(
     lag = str_remove(lag, 'Lag '),
     period = case_when(
-      period == 'rsqall' ~ 'All Years',
+      period == 'rsqall' ~ '1995 to 2024',
       period == 'rsqpre' ~ 'Before 2010',
       period == 'rsqpos' ~ '2010 and After'
     ),
     period = factor(
       period,
-      levels = c('All Years', 'Before 2010', '2010 and After')
+      levels = c('1995 to 2024', 'Before 2010', '2010 and After')
     )
   )
 
 ggplot(mod, aes(x = as.numeric(lag), y = rsq, color = period)) +
   geom_line() +
   geom_point() +
-  scale_x_continuous(breaks = 0:5) +
-  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_continuous(breaks = 0:6) +
   labs(
     x = 'Lag in Months',
     y = expression(R^2),
     color = 'Period',
-    title = 'Relationship between Chlorophyll-a and Total Nitrogen Load in Old Tampa Bay',
-    subtitle = 'Using Monthly Average Data'
+    title = 'Model fits (R²) by Lag Time and Period'
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = 'bottom')
 ```
