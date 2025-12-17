@@ -120,6 +120,7 @@ window.Quarto = {
   <li><a href="#original-model-all-bay-segments" id="toc-original-model-all-bay-segments" class="nav-link active" data-scroll-target="#original-model-all-bay-segments">Original Model, All Bay Segments</a></li>
   <li><a href="#otb-only-model" id="toc-otb-only-model" class="nav-link" data-scroll-target="#otb-only-model">OTB Only Model</a></li>
   <li><a href="#assimilative-capacity-analysis" id="toc-assimilative-capacity-analysis" class="nav-link" data-scroll-target="#assimilative-capacity-analysis">Assimilative Capacity Analysis</a></li>
+  <li><a href="#model-improvements" id="toc-model-improvements" class="nav-link" data-scroll-target="#model-improvements">Model Improvements</a></li>
   </ul>
 </nav>
 </div>
@@ -160,13 +161,13 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="original-model-all-bay-segments">Original Model, All Bay Segments</h2>
 <p>The cumulative lag model from <a href="https://drive.google.com/file/d/1kZkvuprvsMyN9nPS5PHYvXHyo1KQxKTr/view">Janicki and Wade 1996</a> is specified as:</p>
 <p><span class="math display">\[
-\text{chla}_{t, s} = \alpha_{t, s} + \beta_s \left( \Sigma_{t = 0}^{n} L_{t, s} \right)
+\text{chla}_{t, s} = \alpha_{t, s} + \beta_s \left( \Sigma_{i = I_0}^{I_n} L_{t - i, s} \right)
 \]</span></p>
-<p>where <span class="math inline">\(\text{chla}_{t, s}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span> and bay segment <span class="math inline">\(s\)</span>, <span class="math inline">\(\alpha_{t, s}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span> and <span class="math inline">\(s\)</span>, <span class="math inline">\(\beta_s\)</span> is the coefficient for the cumulative load term that varies by <span class="math inline">\(s\)</span>, and <span class="math inline">\(L_{t, s}\)</span> is the cumulative nitrogen nitrogen load evaluated at different lags from 0 to <span class="math inline">\(n\)</span> months for each <span class="math inline">\(s\)</span>.</p>
+<p>where <span class="math inline">\(\text{chla}_{t, s}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span> and bay segment <span class="math inline">\(s\)</span>, <span class="math inline">\(\alpha_{t, s}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span> and <span class="math inline">\(s\)</span>, <span class="math inline">\(\beta_s\)</span> is the coefficient for the cumulative load term that varies by <span class="math inline">\(s\)</span>, and <span class="math inline">\(L_{t - 1, s}\)</span> is the cumulative nitrogen nitrogen load evaluated at different lags from <span class="math inline">\(I_0\)</span> as the present month in the time series to <span class="math inline">\(I_n\)</span> months for each <span class="math inline">\(s\)</span>.</p>
 <p>The individaul lag model is specified as: <span class="math display">\[
-\text{chla}_{t, s} = \alpha_{t, s} + \beta_s L_{n, s}
+\text{chla}_{t, s} = \alpha_{t, s} + \beta_s L_{I_n, s}
 \]</span></p>
-<p>where <span class="math inline">\(\text{chla}_{t, s}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span> and bay segment <span class="math inline">\(s\)</span>, <span class="math inline">\(\alpha_{t, s}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span> and <span class="math inline">\(s\)</span>, <span class="math inline">\(\beta_s\)</span> is the coefficient for the individual load term that varies by <span class="math inline">\(s\)</span>, and <span class="math inline">\(L_{t, s}\)</span> is the individual nitrogen load evaluated at different monthly <span class="math inline">\(n\)</span> lags for each <span class="math inline">\(s\)</span>.</p>
+<p>where <span class="math inline">\(\text{chla}_{t, s}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span> and bay segment <span class="math inline">\(s\)</span>, <span class="math inline">\(\alpha_{t, s}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span> and <span class="math inline">\(s\)</span>, <span class="math inline">\(\beta_s\)</span> is the coefficient for the individual load term that varies by <span class="math inline">\(s\)</span>, and <span class="math inline">\(L_{t, s}\)</span> is the individual nitrogen load evaluated at different monthly <span class="math inline">\(I_n\)</span> lags for each <span class="math inline">\(s\)</span>.</p>
 <p>Both models are run with the following linear model structure in R, where the <code>tn_load</code> variable is either the cumulative or individual lag load for different <span class="math inline">\(n\)</span> lags.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>chla <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> <span class="fu">factor</span>(bay_segment)<span class="sc">:</span><span class="fu">factor</span>(mo) <span class="sc">+</span> tn_load<span class="sc">:</span><span class="fu">factor</span>(bay_segment)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -222,13 +223,13 @@ window.Quarto = {
 <p>The models are the same as above except the bay segment term is removed since only OTB is being modeled.</p>
 <p>The cumulative lag model from is specified as:</p>
 <p><span class="math display">\[
-\text{chla}_{t} = \alpha_{t} + \beta \left( \Sigma_{t = 0}^{n} L_{t} \right)
+\text{chla}_{t} = \alpha_{t} + \beta \left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right)
 \]</span></p>
-<p>where <span class="math inline">\(\text{chla}_{t}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span>, <span class="math inline">\(\alpha_{t}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span>, <span class="math inline">\(\beta\)</span> is the coefficient for the cumulative load term, and <span class="math inline">\(L_{t}\)</span> is the cumulative nitrogen load evaluated at different lags from 0 to <span class="math inline">\(n\)</span> months.</p>
+<p>where <span class="math inline">\(\text{chla}_{t}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span>, <span class="math inline">\(\alpha_{t}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span>, <span class="math inline">\(\beta\)</span> is the coefficient for the cumulative load term, and <span class="math inline">\(L_{t - i}\)</span> is the cumulative nitrogen load evaluated at different lags from <span class="math inline">\(I_0\)</span> for the present month to <span class="math inline">\(I_n\)</span> months.</p>
 <p>The individaul lag model is specified as: <span class="math display">\[
-\text{chla}_{t, s} = \alpha_{t, s} + \beta_s L_{n, s}
+\text{chla}_{t} = \alpha_{t} + \beta L_{I_n}
 \]</span></p>
-<p>where <span class="math inline">\(\text{chla}_{t}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span>, <span class="math inline">\(\alpha_{t}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span>, <span class="math inline">\(\beta\)</span> is the coefficient for the individual load term, and <span class="math inline">\(L_{t}\)</span> is the individual nitrogen load evaluated at different monthly <span class="math inline">\(n\)</span> lags.</p>
+<p>where <span class="math inline">\(\text{chla}_{t}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span>, <span class="math inline">\(\alpha_{t}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span>, <span class="math inline">\(\beta\)</span> is the coefficient for the individual load term, and <span class="math inline">\(L_{I_n}\)</span> is the individual nitrogen load evaluated at different monthly <span class="math inline">\(I_n\)</span> lags.</p>
 <p>Both models are run with the following linear model structure in R, where the <code>tn_load</code> variable is either the cumulative or individual lag load for different <span class="math inline">\(n\)</span> lags.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>chla <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> <span class="fu">factor</span>(mo) <span class="sc">+</span> tn_load</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -335,12 +336,35 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>The average response of chlorophyll-a to nitrogen load changes was then estimated for each time period by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario. The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario. The dashed red line indicates the target chlorophyll-a concentration of 9.3 µg/L. The arrows indicate the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration for each time period based on linear interpolation of the average response curves.</p>
+<p>The average response of chlorophyll-a to nitrogen load changes was then estimated for each time period by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario. The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario. The dashed red line indicates the target chlorophyll-a concentration of 9.3 µg/L. The arrows indicate the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration for each time period based on linear interpolation of the average response curves. The estimated loads needed to achieve 9.3 µg/L chlorophyll-a are 569 tons/year before 2010 and 645 tons/year for 2010 and after.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><a href="explore_files/figure-html/unnamed-chunk-16-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="explore_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="model-improvements" class="level2">
+<h2 class="anchored" data-anchor-id="model-improvements">Model Improvements</h2>
+<p>The above models used to predict the assimilative capacity of Old Tampa Bay, particularly for the period after 2010, likely provide an overestimate of how much loading the bay segment can assimilate. This is likely true because of the residual patterns - the model does not capture extreme values. The model does not consider an inherently log-normal response variable and additional predictors that could improve the model fit to provide a more accurate estimate of how nitrogen load influences chlorophyll-a.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-17-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img src="explore_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To address this issue, an additional model was developed using log-transformed chlorophyll-a as the response variable and additional predictors including salinity and temperature.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-18-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="explore_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
