@@ -42,7 +42,10 @@ lagplo_fun <- function(x, subtitle, col) {
       title = 'Monthly Relationship between Chlorophyll-a and Total Nitrogen',
       subtitle = subtitle
     ) +
-    theme_minimal()
+    theme_minimal() +
+    theme(
+      axis.text = element_text(size = 8)
+    )
 
   return(p)
 }

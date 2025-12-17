@@ -437,3 +437,88 @@ rsqplo_fun(mod)
 ```
 
 :::
+
+## Cumulative Lagged Model to Predict 9.3 $\mu$g/L Chl-a Threshold
+
+```{r}
+toprdaddotb <- tomodaddotb |>
+  pivot_wider(
+    names_from = lag,
+    values_from = tn_load
+  ) |>
+  group_nest(yrcat) |>
+  mutate(
+    model = map(data, function(x) {
+      lm(
+        chla ~ 0 + factor(mo) + `Lag 3`,
+        data = x,
+        na.action = 'na.exclude'
+      )
+    }),
+    pred = map2(model, data, function(mod, dat) {
+      predict(mod, newdata = dat)
+    })
+  )
+
+toplo <- toprdaddotb |>
+  select(-model) |>
+  unnest(c(data, pred))
+
+ggplot(toplo, aes(x = date, y = chla)) +
+  geom_point() +
+  geom_line(aes(y = pred, group = yrcat, color = yrcat)) +
+  geom_hline(yintercept = 9.3, linetype = 'dashed', color = 'red') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Observed and Predicted Chlorophyll-a in Old Tampa Bay',
+    y = 'Chlorophyll-a (µg/L)',
+    x = NULL,
+    color = 'Period'
+  )
+```
+
+```{r}
+annavg <- tbeptools::anlz_avedat(epcdata)$ann |>
+  filter(bay_segment %in% 'OTB', var == 'mean_chla') |>
+  filter(yr >= 1995) |>
+  mutate(
+    achieve = ifelse(val <= 9.3, 'Yes', 'No'),
+  )
+
+modestavg <- toplo |>
+  summarize(
+    predchla = mean(pred, na.rm = TRUE),
+    .by = c(yr, yrcat)
+  ) |>
+  mutate(
+    achieve = ifelse(predchla <= 9.3, 'Yes', 'No')
+  )
+
+ggplot(annavg, aes(x = yr, y = val)) +
+  geom_line(aes(color = 'Observed')) +
+  geom_point(aes(shape = achieve, color = 'Observed'), size = 3) +
+  geom_line(data = modestavg, aes(x = yr, y = predchla, color = 'Predicted')) +
+  geom_point(
+    data = modestavg,
+    aes(x = yr, y = predchla, shape = achieve, color = 'Predicted'),
+    size = 3
+  ) +
+  geom_hline(yintercept = 9.3, linetype = 'dashed', color = 'red') +
+  scale_shape_manual(values = c(16, 17)) +
+  scale_color_manual(values = c('Observed' = 'black', 'Predicted' = 'blue')) +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  guides(color = guide_legend(override.aes = list(shape = NA))) +
+  labs(
+    title = 'Annual Average Observed and Predicted Chlorophyll-a in Old Tampa Bay',
+    y = 'Annual Average Chlorophyll-a (µg/L)',
+    x = 'Year',
+    shape = 'Meets 9.3 µg/L Target',
+    color = NULL
+  )
+```
