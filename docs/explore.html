@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Tampa Bay Estuary Program">
-<meta name="dcterms.date" content="2025-12-17">
+<meta name="dcterms.date" content="2025-12-18">
 
 <title>Exploring the Assimilative Capacity of Old Tampa Bay</title>
 <style>
@@ -145,7 +145,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">December 17, 2025</p>
+      <p class="date">December 18, 2025</p>
     </div>
   </div>
   
@@ -170,7 +170,7 @@ window.Quarto = {
 <p>where <span class="math inline">\(\text{chla}_{t, s}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span> and bay segment <span class="math inline">\(s\)</span>, <span class="math inline">\(\alpha_{t, s}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span> and <span class="math inline">\(s\)</span>, <span class="math inline">\(\beta_s\)</span> is the coefficient for the individual load term that varies by <span class="math inline">\(s\)</span>, and <span class="math inline">\(L_{t, s}\)</span> is the individual nitrogen load evaluated at different monthly <span class="math inline">\(I_n\)</span> lags for each <span class="math inline">\(s\)</span>.</p>
 <p>Both models are run with the following linear model structure in R, where the <code>tn_load</code> variable is either the cumulative or individual lag load for different <span class="math inline">\(n\)</span> lags.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>chla <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> <span class="fu">factor</span>(bay_segment)<span class="sc">:</span><span class="fu">factor</span>(mo) <span class="sc">+</span> tn_load<span class="sc">:</span><span class="fu">factor</span>(bay_segment)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>chla <span class="sc">~</span> <span class="fu">factor</span>(bay_segment)<span class="sc">:</span><span class="fu">factor</span>(mo) <span class="sc">+</span> tn_load<span class="sc">:</span><span class="fu">factor</span>(bay_segment)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Cumulative Lags</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Individual Lags</a></li></ul>
@@ -232,7 +232,7 @@ window.Quarto = {
 <p>where <span class="math inline">\(\text{chla}_{t}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span>, <span class="math inline">\(\alpha_{t}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span>, <span class="math inline">\(\beta\)</span> is the coefficient for the individual load term, and <span class="math inline">\(L_{I_n}\)</span> is the individual nitrogen load evaluated at different monthly <span class="math inline">\(I_n\)</span> lags.</p>
 <p>Both models are run with the following linear model structure in R, where the <code>tn_load</code> variable is either the cumulative or individual lag load for different <span class="math inline">\(n\)</span> lags.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>chla <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> <span class="fu">factor</span>(mo) <span class="sc">+</span> tn_load</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>chla <span class="sc">~</span> <span class="fu">factor</span>(mo) <span class="sc">+</span> tn_load</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Cumulative Lags</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Individual Lags</a></li></ul>
@@ -349,7 +349,7 @@ window.Quarto = {
 </section>
 <section id="model-improvements" class="level2">
 <h2 class="anchored" data-anchor-id="model-improvements">Model Improvements</h2>
-<p>The above models used to predict the assimilative capacity of Old Tampa Bay, particularly for the period after 2010, likely provide an overestimate of how much loading the bay segment can assimilate. This is likely true because of the residual patterns - the model does not capture extreme values. The model does not consider an inherently log-normal response variable and additional predictors that could improve the model fit to provide a more accurate estimate of how nitrogen load influences chlorophyll-a.</p>
+<p>The above models used to predict the assimilative capacity of Old Tampa Bay, particularly for the period after 2010, likely provide an overestimate of how much loading the bay segment can assimilate. This is evident by evaluating the residual patterns - the model does not capture extreme values. Results could be improved by modeling an inherently log-normal response variable and including additional predictors to provide a more accurate estimate of how nitrogen load influences chlorophyll-a.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -359,7 +359,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>To address this issue, an additional model was developed using log-transformed chlorophyll-a as the response variable and additional predictors including salinity and temperature.</p>
+<p>To address this issue, an additional model was developed using log-transformed chlorophyll-a as the response variable and additional predictors, including salinity and temperature.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -369,6 +369,82 @@ window.Quarto = {
 </div>
 </div>
 </div>
+<p>Collinearity among the new predictors was assessed using variance inflation factors (VIFs). The values are sufficiently low to include all predictors in the model.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code> var     vif             
+ sal     1.07184807857186
+ temp    1.50867898743071
+ tn_load 1.59373501251331
+
+All variables have VIF &lt; 10, max VIF 1.59 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "sal"     "temp"    "tn_load"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-20-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18"><img src="explore_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-21-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19"><img src="explore_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The annual average observed and predicted chlorophyll-a concentrations are compared to the target of 9.3 µg/L for Old Tampa Bay below.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-22-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-20"><img src="explore_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-23-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21"><img src="explore_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-23-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-22"><img src="explore_files/figure-html/unnamed-chunk-23-2.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Monthly model predictions are then aggregated to annual average predicted chlorophyll-a and total nitrogen loads for each load reduction scenario.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-24-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-23"><img src="explore_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-24-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-24"><img src="explore_files/figure-html/unnamed-chunk-24-2.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Figure out better way for load reductions to work…</p>
 </section>
 
 </main>

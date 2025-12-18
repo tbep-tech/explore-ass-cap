@@ -17,12 +17,8 @@ execute:
 
 ```{r}
 #| include: false
-library(sf)
 library(tidyverse)
 library(here)
-library(reactable)
-library(reactablefmtr)
-library(leaflet)
 library(patchwork)
 library(GGally)
 
@@ -40,7 +36,7 @@ wqmo <- tbeptools::anlz_avedat(epcdata)$mos |>
     date = make_date(yr, mo, day = 1)
   )
 
-# join and create up to five month lags for tn_load
+# join and create up to six month lags for tn_load
 tomod <- inner_join(wqmo, lddat, by = c('bay_segment', 'date', 'yr', 'mo')) |>
   mutate(
     tn_load_lag1 = lag(tn_load, 1),
@@ -107,7 +103,7 @@ Both models are run with the following linear model structure in  R, where the `
 ```{r}
 #| eval: false
 #| echo: true
-chla ~ 0 + factor(bay_segment):factor(mo) + tn_load:factor(bay_segment)
+chla ~ factor(bay_segment):factor(mo) + tn_load:factor(bay_segment)
 ```
 
 ::: {.panel-tabset}
@@ -137,15 +133,15 @@ mod <- tomodadd |>
   mutate(
     model = map(data, function(x) {
       modall <- lm(
-        chla ~ 0 + factor(bay_segment):factor(mo) + tn_load:factor(bay_segment),
+        chla ~ factor(bay_segment):factor(mo) + tn_load:factor(bay_segment),
         data = x
       )
       modpre <- lm(
-        chla ~ 0 + factor(bay_segment):factor(mo) + tn_load:factor(bay_segment),
+        chla ~ factor(bay_segment):factor(mo) + tn_load:factor(bay_segment),
         data = x[x$yrcat == 'Before 2010', ]
       )
       modpos <- lm(
-        chla ~ 0 + factor(bay_segment):factor(mo) + tn_load:factor(bay_segment),
+        chla ~ factor(bay_segment):factor(mo) + tn_load:factor(bay_segment),
         data = x[x$yrcat == '2010 and After', ]
       )
 
@@ -209,15 +205,15 @@ mod <- tomodind |>
   mutate(
     model = map(data, function(x) {
       modall <- lm(
-        chla ~ 0 + factor(bay_segment):factor(mo) + tn_load:factor(bay_segment),
+        chla ~ factor(bay_segment):factor(mo) + tn_load:factor(bay_segment),
         data = x
       )
       modpre <- lm(
-        chla ~ 0 + factor(bay_segment):factor(mo) + tn_load:factor(bay_segment),
+        chla ~ factor(bay_segment):factor(mo) + tn_load:factor(bay_segment),
         data = x[x$yrcat == 'Before 2010', ]
       )
       modpos <- lm(
-        chla ~ 0 + factor(bay_segment):factor(mo) + tn_load:factor(bay_segment),
+        chla ~ factor(bay_segment):factor(mo) + tn_load:factor(bay_segment),
         data = x[x$yrcat == '2010 and After', ]
       )
 
@@ -282,7 +278,7 @@ Both models are run with the following linear model structure in  R, where the `
 ```{r}
 #| eval: false
 #| echo: true
-chla ~ 0 + factor(mo) + tn_load
+chla ~ factor(mo) + tn_load
 ```
 
 ::: {.panel-tabset}
@@ -315,15 +311,15 @@ mod <- tomodaddotb |>
   mutate(
     model = map(data, function(x) {
       modall <- lm(
-        chla ~ 0 + factor(mo) + tn_load,
+        chla ~ factor(mo) + tn_load,
         data = x
       )
       modpre <- lm(
-        chla ~ 0 + factor(mo) + tn_load,
+        chla ~ factor(mo) + tn_load,
         data = x[x$yrcat == 'Before 2010', ]
       )
       modpos <- lm(
-        chla ~ 0 + factor(mo) + tn_load,
+        chla ~ factor(mo) + tn_load,
         data = x[x$yrcat == '2010 and After', ]
       )
 
@@ -390,15 +386,15 @@ mod <- tomodindotb |>
   mutate(
     model = map(data, function(x) {
       modall <- lm(
-        chla ~ 0 + factor(mo) + tn_load,
+        chla ~ factor(mo) + tn_load,
         data = x
       )
       modpre <- lm(
-        chla ~ 0 + factor(mo) + tn_load,
+        chla ~ factor(mo) + tn_load,
         data = x[x$yrcat == 'Before 2010', ]
       )
       modpos <- lm(
-        chla ~ 0 + factor(mo) + tn_load,
+        chla ~ factor(mo) + tn_load,
         data = x[x$yrcat == '2010 and After', ]
       )
 
@@ -453,7 +449,7 @@ toprdaddotb <- tomodaddotb |>
   mutate(
     model = map(data, function(x) {
       lm(
-        chla ~ 0 + factor(mo) + `Lag 3`,
+        chla ~ factor(mo) + `Lag 3`,
         data = x,
         na.action = 'na.exclude'
       )
@@ -746,7 +742,7 @@ ggplot(toplo3, aes(x = tn_load, y = avechl)) +
 
 ## Model Improvements
 
-The above models used to predict the assimilative capacity of Old Tampa Bay, particularly for the period after 2010, likely provide an overestimate of how much loading the bay segment can assimilate.  This is likely true because of the residual patterns - the model does not capture extreme values.  The model does not consider an inherently log-normal response variable and additional predictors that could improve the model fit to provide a more accurate estimate of how nitrogen load influences chlorophyll-a.
+The above models used to predict the assimilative capacity of Old Tampa Bay, particularly for the period after 2010, likely provide an overestimate of how much loading the bay segment can assimilate.  This is evident by evaluating the residual patterns - the model does not capture extreme values.  Results could be improved by modeling an inherently log-normal response variable and including additional predictors to provide a more accurate estimate of how nitrogen load influences chlorophyll-a.
 
 ```{r}
 aftmod <- toprdaddotb$model[[1]]
@@ -761,7 +757,7 @@ ggplot(data.frame(residuals = residuals(aftmod)), aes(sample = residuals)) +
   theme_minimal()
 ```
 
-To address this issue, an additional model was developed using log-transformed chlorophyll-a as the response variable and additional predictors including salinity and temperature. 
+To address this issue, an additional model was developed using log-transformed chlorophyll-a as the response variable and additional predictors, including salinity and temperature. 
 
 ```{r}
 newdat <- epcdata |>
@@ -784,8 +780,312 @@ toplo <- newdat |>
   select(chla, sal, temp, tn_load) |>
   mutate(
     chla = log10(chla),
-    tn_load = log10(tn_load)
+    tn_load = log10(1 + tn_load)
   )
 
 ggpairs(toplo)
 ```
+
+Collinearity among the new predictors was assessed using variance inflation factors (VIFs).  The values are sufficiently low to include all predictors in the model.
+
+```{r}
+# check vif
+source(
+  'https://gist.githubusercontent.com/fawda123/4717702/raw/b5ccabd6966376552257940f9bad7bd344b49c49/vif_fun.r'
+)
+vif_func(toplo[, names(toplo) != 'chla'])
+```
+
+```{r}
+# create up to six month lags for tn_load
+newtomod <- newdat |>
+  mutate(
+    tn_load_lag1 = lag(tn_load, 1),
+    tn_load_lag2 = lag(tn_load, 2),
+    tn_load_lag3 = lag(tn_load, 3),
+    tn_load_lag4 = lag(tn_load, 4),
+    tn_load_lag5 = lag(tn_load, 5),
+    tn_load_lag6 = lag(tn_load, 6),
+    yrcat = ifelse(yr < 2010, 'Before 2010', '2010 and After'),
+    .by = bay_segment
+  ) |>
+  rename(tn_load_lag0 = tn_load) |>
+  mutate(
+    tn_load_lag1 = rowSums(pick(tn_load_lag0:tn_load_lag1), na.rm = FALSE),
+    tn_load_lag2 = rowSums(pick(tn_load_lag0:tn_load_lag2), na.rm = FALSE),
+    tn_load_lag3 = rowSums(pick(tn_load_lag0:tn_load_lag3), na.rm = FALSE),
+    tn_load_lag4 = rowSums(pick(tn_load_lag0:tn_load_lag4), na.rm = FALSE),
+    tn_load_lag5 = rowSums(pick(tn_load_lag0:tn_load_lag5), na.rm = FALSE),
+    tn_load_lag6 = rowSums(pick(tn_load_lag0:tn_load_lag6), na.rm = FALSE)
+  ) |>
+  pivot_longer(
+    cols = starts_with('tn_load_lag'),
+    names_to = 'lag',
+    values_to = 'tn_load'
+  ) |>
+  mutate(
+    lag = str_remove(lag, 'tn_load_'),
+    lag = str_replace(lag, 'lag', 'Lag ')
+  )
+
+mod <- newtomod |>
+  group_nest(lag) |>
+  mutate(
+    model = map(data, function(x) {
+      modall <- lm(
+        log10(chla) ~ factor(mo) + log10(1 + tn_load) + sal + temp,
+        data = x
+      )
+      modpre <- lm(
+        log10(chla) ~ factor(mo) + log10(1 + tn_load) + sal + temp,
+        data = x[x$yrcat == 'Before 2010', ]
+      )
+      modpos <- lm(
+        log10(chla) ~ factor(mo) + log10(1 + tn_load) + sal + temp,
+        data = x[x$yrcat == '2010 and After', ]
+      )
+
+      # get rsq for all
+      rsqall <- summary(modall)$r.squared
+      rsqpre <- summary(modpre)$r.squared
+      rsqpos <- summary(modpos)$r.squared
+
+      tibble(
+        rsqall = rsqall,
+        rsqpre = rsqpre,
+        rsqpos = rsqpos
+      )
+    })
+  ) |>
+  select(-data) |>
+  unnest(model) |>
+  pivot_longer(
+    cols = starts_with('rsq'),
+    names_to = 'period',
+    values_to = 'rsq'
+  ) |>
+  mutate(
+    lag = str_remove(lag, 'Lag '),
+    period = case_when(
+      period == 'rsqall' ~ '1995 to 2024',
+      period == 'rsqpre' ~ 'Before 2010',
+      period == 'rsqpos' ~ '2010 and After'
+    ),
+    period = factor(
+      period,
+      levels = c('1995 to 2024', 'Before 2010', '2010 and After')
+    )
+  )
+
+rsqplo_fun(mod, ylim = c(0.4, 0.76))
+```
+
+```{r}
+newtoprd <- newtomod |>
+  pivot_wider(
+    names_from = lag,
+    values_from = tn_load
+  ) |>
+  group_nest(yrcat) |>
+  mutate(
+    model = map(data, function(x) {
+      lm(
+        log10(chla) ~ factor(mo) + log10(1 + `Lag 3`) + sal + temp,
+        ,
+        data = x,
+        na.action = 'na.exclude'
+      )
+    }),
+    pred = map2(model, data, function(mod, dat) {
+      10^predict(mod, newdata = dat)
+    })
+  )
+
+toplo <- newtoprd |>
+  select(-model) |>
+  unnest(c(data, pred))
+
+ggplot(toplo, aes(x = date, y = chla)) +
+  geom_point() +
+  geom_line(aes(y = pred, group = yrcat, color = yrcat)) +
+  # geom_hline(yintercept = 9.3, linetype = 'dashed', color = 'red') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Monthly Observed and Predicted Chlorophyll-a in Old Tampa Bay',
+    y = 'µg/L',
+    x = NULL,
+    color = 'Model'
+  )
+```
+
+The annual average observed and predicted chlorophyll-a concentrations are compared to the target of 9.3 µg/L for Old Tampa Bay below.
+
+```{r}
+annavg <- tbeptools::anlz_avedat(epcdata)$ann |>
+  filter(bay_segment %in% 'OTB', var == 'mean_chla') |>
+  filter(yr >= 1995) |>
+  mutate(
+    achieve = ifelse(val <= 9.3, 'Yes', 'No'),
+  )
+
+modestavg <- toplo |>
+  summarize(
+    predchla = mean(pred, na.rm = TRUE),
+    .by = c(yr, yrcat)
+  ) |>
+  mutate(
+    achieve = ifelse(predchla <= 9.3, 'Yes', 'No')
+  )
+
+ggplot(annavg, aes(x = yr, y = val)) +
+  geom_line(aes(color = 'Observed')) +
+  geom_point(aes(shape = achieve, color = 'Observed'), size = 3) +
+  geom_line(data = modestavg, aes(x = yr, y = predchla, color = 'Predicted')) +
+  geom_point(
+    data = modestavg,
+    aes(x = yr, y = predchla, shape = achieve, color = 'Predicted'),
+    size = 3
+  ) +
+  geom_hline(yintercept = 9.3, linetype = 'dashed', color = 'red') +
+  scale_shape_manual(values = c(16, 17)) +
+  scale_color_manual(values = c('Observed' = 'black', 'Predicted' = 'blue')) +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  guides(color = guide_legend(override.aes = list(shape = NA))) +
+  labs(
+    title = 'Annual Average Observed and Predicted Chlorophyll-a in Old Tampa Bay',
+    y = 'µg/L',
+    x = 'Year',
+    shape = 'Meets 9.3 µg/L Target',
+    color = NULL
+  )
+```
+
+```{r}
+redscn <- crossing(
+  redscn = seq(0, 1, by = 0.05),
+  newdat |>
+    mutate(yrcat = ifelse(yr < 2010, 'Before 2010', '2010 and After'))
+) |>
+  group_nest(redscn, yrcat) |>
+  mutate(
+    yrcat = factor(
+      yrcat,
+      levels = c('Before 2010', '2010 and After')
+    ),
+    data = pmap(list(redscn, data), function(red, dat) {
+      dat |>
+        mutate(
+          tn_load_lag0 = tn_load * red,
+          tn_load_lag1 = lag(tn_load_lag0, 1),
+          tn_load_lag2 = lag(tn_load_lag0, 2),
+          tn_load_lag3 = lag(tn_load_lag0, 3)
+        ) |>
+        mutate(
+          tn_load_lag1 = rowSums(
+            pick(tn_load_lag0:tn_load_lag1),
+            na.rm = FALSE
+          ),
+          tn_load_lag2 = rowSums(
+            pick(tn_load_lag0:tn_load_lag2),
+            na.rm = FALSE
+          ),
+          tn_load_lag3 = rowSums(pick(tn_load_lag0:tn_load_lag3), na.rm = FALSE)
+        ) |>
+        rename(`Lag 3` = tn_load_lag3)
+    }),
+    data = map2(data, yrcat, function(dat, yrc) {
+      mod <- newtoprd |> filter(yrcat == yrc) |> pull(model)
+      prd <- predict(
+        mod[[1]],
+        newdata = dat,
+      )
+      bind_cols(dat, tibble(predchla = 10^prd))
+    }),
+    annavg = map(data, function(dat) {
+      dat |>
+        summarize(
+          tn_load = sum(tn_load_lag0, na.rm = TRUE),
+          predchla = mean(predchla, na.rm = TRUE),
+          .by = yr
+        )
+    })
+  )
+
+toplo <- redscn |>
+  select(redscn, yrcat, data) |>
+  unnest(data)
+
+ggplot(toplo, aes(x = date, y = tn_load_lag0)) +
+  geom_line(aes(group = redscn, color = redscn)) +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'D') +
+  facet_wrap(~yrcat, ncol = 1, scales = 'free_x') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Monthly Load Reduction Scenarios',
+    y = 'tons/month',
+    x = NULL
+  )
+
+ggplot(toplo, aes(x = date, y = predchla)) +
+  geom_line(aes(group = redscn, color = redscn)) +
+  geom_hline(yintercept = 9.3, linetype = 'dashed', color = 'red') +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'C') +
+  facet_wrap(~yrcat, ncol = 1, scales = 'free_x') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Monthly Predicted Chlorophyll-a Under Load Reduction Scenarios',
+    y = 'µg/L',
+    x = NULL
+  )
+```
+
+Monthly  model predictions are then aggregated to annual average predicted chlorophyll-a and total nitrogen loads for each load reduction scenario.
+
+```{r}
+toplo2 <- redscn |>
+  select(redscn, yrcat, annavg) |>
+  unnest(annavg)
+
+ggplot(toplo2, aes(x = yr, y = tn_load, group = redscn)) +
+  geom_line(aes(color = redscn)) +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'D') +
+  facet_wrap(~yrcat, ncol = 1, scales = 'free_x') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Annual Total Nitrogen Loads from Monthly Reduction Scenarios',
+    y = 'tons/year',
+    x = NULL
+  )
+
+ggplot(toplo2, aes(x = yr, y = predchla, group = redscn)) +
+  geom_line(aes(color = redscn)) +
+  geom_hline(yintercept = 9.3, linetype = 'dashed', color = 'red') +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'C') +
+  facet_wrap(~yrcat, ncol = 1, scales = 'free_x') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Annual Average Predicted Chlorophyll-a Under Load Reduction Scenarios',
+    y = 'µg/L',
+    x = NULL
+  )
+```
+
+Figure out better way for load reductions to work...

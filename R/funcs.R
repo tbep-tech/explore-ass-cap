@@ -51,12 +51,12 @@ lagplo_fun <- function(x, subtitle, col) {
 }
 
 # rsq plot function
-rsqplo_fun <- function(mod) {
+rsqplo_fun <- function(mod, ylim = c(0.4, 0.75)) {
   ggplot(mod, aes(x = as.numeric(lag), y = rsq, color = period)) +
     geom_line() +
     geom_point() +
     scale_x_continuous(breaks = 0:6) +
-    scale_y_continuous(limits = c(0.75, 0.95)) +
+    scale_y_continuous(limits = ylim) +
     labs(
       x = 'Lag in Months',
       y = expression(R^2),
