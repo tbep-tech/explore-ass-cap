@@ -24,7 +24,12 @@ rdataload <- function(dataurl = NULL) {
 }
 
 # lag plot function
-lagplo_fun <- function(x, subtitle, col) {
+lagplo_fun <- function(x, subtitle, col, title = T) {
+  ttl <- 'Chlorophyll-a vs Total Nitrogen Load by Lag Time'
+  if (!title) {
+    ttl <- NULL
+  }
+
   p <- ggplot(x, aes(x = tn_load / 100, y = chla)) +
     geom_point(alpha = 0.5, size = 0.5) +
     geom_smooth(
@@ -39,7 +44,7 @@ lagplo_fun <- function(x, subtitle, col) {
     labs(
       x = 'Total Nitrogen Load (0.01 x tons/month)',
       y = 'Chlorophyll-a (µg/L)',
-      title = 'Monthly Relationship between Chlorophyll-a and Total Nitrogen',
+      title = ttl,
       subtitle = subtitle
     ) +
     theme_minimal() +

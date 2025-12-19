@@ -48,6 +48,9 @@ tomod <- inner_join(wqmo, lddat, by = c('bay_segment', 'date', 'yr', 'mo')) |>
     yrcat = ifelse(yr < 2010, 'Before 2010', '2010 and After'),
     .by = bay_segment
   ) |>
+  group_by(bay_segment) |>
+  fill(tn_load_lag1:tn_load_lag6, .direction = 'up') |>
+  ungroup() |>
   rename(tn_load_lag0 = tn_load)
 
 tomodadd <- tomod |>
@@ -116,12 +119,14 @@ pall <- lagplo_fun(tomodadd, '1995 to 2024', '#F8766D')
 ppre <- lagplo_fun(
   tomodadd[tomodadd$yrcat %in% 'Before 2010', ],
   'Before 2010',
-  '#00BA38'
+  '#00BA38',
+  F
 )
 ppos <- lagplo_fun(
   tomodadd[tomodadd$yrcat %in% '2010 and After', ],
   '2010 and After',
-  '#619CFF'
+  '#619CFF',
+  F
 )
 
 pall + ppre + ppos + plot_layout(ncol = 1, axis_titles = 'collect')
@@ -188,12 +193,14 @@ pall <- lagplo_fun(tomodind, '1995 to 2024', '#F8766D')
 ppre <- lagplo_fun(
   tomodind[tomodind$yrcat %in% 'Before 2010', ],
   'Before 2010',
-  '#00BA38'
+  '#00BA38',
+  F
 )
 ppos <- lagplo_fun(
   tomodind[tomodind$yrcat %in% '2010 and After', ],
   '2010 and After',
-  '#619CFF'
+  '#619CFF',
+  F
 )
 
 pall + ppre + ppos + plot_layout(ncol = 1, axis_titles = 'collect')
@@ -294,12 +301,14 @@ pall <- lagplo_fun(tomodaddotb, '1995 to 2024', '#F8766D')
 ppre <- lagplo_fun(
   tomodaddotb[tomodaddotb$yrcat %in% 'Before 2010', ],
   'Before 2010',
-  '#00BA38'
+  '#00BA38',
+  F
 )
 ppos <- lagplo_fun(
   tomodaddotb[tomodaddotb$yrcat %in% '2010 and After', ],
   '2010 and After',
-  '#619CFF'
+  '#619CFF',
+  F
 )
 
 pall + ppre + ppos + plot_layout(ncol = 1, axis_titles = 'collect')
@@ -369,12 +378,14 @@ pall <- lagplo_fun(tomodindotb, '1995 to 2024', '#F8766D')
 ppre <- lagplo_fun(
   tomodindotb[tomodindotb$yrcat %in% 'Before 2010', ],
   'Before 2010',
-  '#00BA38'
+  '#00BA38',
+  F
 )
 ppos <- lagplo_fun(
   tomodindotb[tomodindotb$yrcat %in% '2010 and After', ],
   '2010 and After',
-  '#619CFF'
+  '#619CFF',
+  F
 )
 
 pall + ppre + ppos + plot_layout(ncol = 1, axis_titles = 'collect')
@@ -549,6 +560,7 @@ redscn <- crossing(
           tn_load_lag2 = lag(tn_load_lag0, 2),
           tn_load_lag3 = lag(tn_load_lag0, 3)
         ) |>
+        fill(tn_load_lag1:tn_load_lag3, .direction = 'up') |>
         mutate(
           tn_load_lag1 = rowSums(
             pick(tn_load_lag0:tn_load_lag1),
@@ -651,14 +663,10 @@ ggplot(toplo2, aes(x = yr, y = predchla, group = redscn)) +
   )
 ```
 
-The average response of chlorophyll-a to nitrogen load changes was then estimated for each time period by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario.  The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 9.3 µg/L.  The arrows indicate the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration for each time period based on linear interpolation of the average response curves. The estimated loads needed to achieve 9.3 µg/L chlorophyll-a are 569 tons/year before 2010 and 645 tons/year for 2010 and after.
-
 ```{r}
 toplo3 <- toplo2 |>
   summarise(
     avechl = mean(predchla, na.rm = TRUE),
-    hichl = t.test(predchla)$conf.int[2],
-    locl = t.test(predchla)$conf.int[1],
     tn_load = mean(tn_load, na.rm = TRUE),
     .by = c(redscn, yrcat)
   )
@@ -685,7 +693,11 @@ addlns <- tibble(
   ),
   tn_load = c(befass, aftass)
 )
+```
 
+The average response of chlorophyll-a to nitrogen load changes was then estimated for each time period by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario.  The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 9.3 µg/L.  The arrows indicate the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration for each time period based on linear interpolation of the average response curves. The estimated loads needed to achieve 9.3 µg/L chlorophyll-a are `r round(befass, 0)` tons/year before 2010 and `r round(aftass, 0)` tons/year for 2010 and after.
+
+```{r}
 ggplot(toplo3, aes(x = tn_load, y = avechl)) +
   geom_line(aes(color = yrcat)) +
   geom_point(aes(color = yrcat)) +
@@ -717,15 +729,6 @@ ggplot(toplo3, aes(x = tn_load, y = avechl)) +
     vjust = 0,
     size = 3,
     fontface = 'bold'
-  ) +
-  geom_ribbon(
-    aes(
-      ymin = locl,
-      ymax = hichl,
-      fill = yrcat
-    ),
-    alpha = 0.2,
-    color = NA
   ) +
   geom_hline(yintercept = 9.3, linetype = 'dashed', color = 'red') +
   facet_wrap(~yrcat) +
@@ -809,6 +812,7 @@ newtomod <- newdat |>
     yrcat = ifelse(yr < 2010, 'Before 2010', '2010 and After'),
     .by = bay_segment
   ) |>
+  fill(tn_load_lag1:tn_load_lag6, .direction = 'up') |>
   rename(tn_load_lag0 = tn_load) |>
   mutate(
     tn_load_lag1 = rowSums(pick(tn_load_lag0:tn_load_lag1), na.rm = FALSE),
@@ -877,7 +881,7 @@ mod <- newtomod |>
     )
   )
 
-rsqplo_fun(mod, ylim = c(0.4, 0.76))
+rsqplo_fun(mod, ylim = range(mod$rsq))
 ```
 
 ```{r}
@@ -986,6 +990,7 @@ redscn <- crossing(
           tn_load_lag2 = lag(tn_load_lag0, 2),
           tn_load_lag3 = lag(tn_load_lag0, 3)
         ) |>
+        fill(tn_load_lag1:tn_load_lag3, .direction = 'up') |>
         mutate(
           tn_load_lag1 = rowSums(
             pick(tn_load_lag0:tn_load_lag1),
