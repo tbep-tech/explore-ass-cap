@@ -27,10 +27,9 @@ p <- ggplot2::ggplot(data = tran, aes(x = yr, y=min_depth, group=yr)) +
   ) +
   ggplot2::labs(
     y = 'Max. Depth of Seagrass Presence Estimate (cm)',
-    title = "2m Target Depth still Applicable"
+    title = "2m Target Depth still Applicable for OTB"
   )
 p
-
 
 newdat <- epcdata |>
   filter(
@@ -54,9 +53,3 @@ newdat <- epcdata |>
   inner_join(lddat, by = c('bay_segment', 'date', 'yr', 'mo')) |>
   arrange(date)
 
-toplo <- newdat |>
-  select(chla, sal, temp, tn_load) |>
-  mutate(
-    chla = log10(chla),
-    tn_load = log10(1 + tn_load)
-  )
