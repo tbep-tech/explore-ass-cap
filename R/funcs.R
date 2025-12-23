@@ -56,17 +56,15 @@ lagplo_fun <- function(x, subtitle, col, title = T) {
 }
 
 # rsq plot function
-rsqplo_fun <- function(mod, ylim = c(0.4, 0.75)) {
-  ggplot(mod, aes(x = as.numeric(lag), y = rsq, color = period)) +
+rsqplo_fun <- function(mod) {
+  ggplot(mod, aes(x = as.numeric(lag), y = rsq)) +
     geom_line() +
     geom_point() +
     scale_x_continuous(breaks = 0:6) +
-    scale_y_continuous(limits = ylim) +
     labs(
       x = 'Lag in Months',
       y = expression(R^2),
-      color = 'Period',
-      title = 'Model fits (R²) by Lag Time and Period'
+      title = 'Model fits (R²) by Lag Time'
     ) +
     theme_minimal() +
     theme(legend.position = 'bottom')

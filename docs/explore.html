@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Tampa Bay Estuary Program">
-<meta name="dcterms.date" content="2025-12-19">
+<meta name="dcterms.date" content="2025-12-23">
 
 <title>Exploring the Assimilative Capacity of Old Tampa Bay</title>
 <style>
@@ -145,7 +145,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">December 19, 2025</p>
+      <p class="date">December 23, 2025</p>
     </div>
   </div>
   
@@ -164,18 +164,10 @@ window.Quarto = {
 \text{chla}_{t, s} = \alpha_{t, s} + \beta_s \left( \Sigma_{i = I_0}^{I_n} L_{t - i, s} \right)
 \]</span></p>
 <p>where <span class="math inline">\(\text{chla}_{t, s}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span> and bay segment <span class="math inline">\(s\)</span>, <span class="math inline">\(\alpha_{t, s}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span> and <span class="math inline">\(s\)</span>, <span class="math inline">\(\beta_s\)</span> is the coefficient for the cumulative load term that varies by <span class="math inline">\(s\)</span>, and <span class="math inline">\(L_{t - 1, s}\)</span> is the cumulative nitrogen nitrogen load evaluated at different lags from <span class="math inline">\(I_0\)</span> as the present month in the time series to <span class="math inline">\(I_n\)</span> months for each <span class="math inline">\(s\)</span>.</p>
-<p>The individaul lag model is specified as: <span class="math display">\[
-\text{chla}_{t, s} = \alpha_{t, s} + \beta_s L_{I_n, s}
-\]</span></p>
-<p>where <span class="math inline">\(\text{chla}_{t, s}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span> and bay segment <span class="math inline">\(s\)</span>, <span class="math inline">\(\alpha_{t, s}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span> and <span class="math inline">\(s\)</span>, <span class="math inline">\(\beta_s\)</span> is the coefficient for the individual load term that varies by <span class="math inline">\(s\)</span>, and <span class="math inline">\(L_{t, s}\)</span> is the individual nitrogen load evaluated at different monthly <span class="math inline">\(I_n\)</span> lags for each <span class="math inline">\(s\)</span>.</p>
-<p>Both models are run with the following linear model structure in R, where the <code>tn_load</code> variable is either the cumulative or individual lag load for different <span class="math inline">\(n\)</span> lags.</p>
+<p>Models are created with the following linear model structure in R, where the <code>tn_load</code> variable is the cumulative lag load for different <span class="math inline">\(n\)</span> lags.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>chla <span class="sc">~</span> <span class="fu">factor</span>(bay_segment)<span class="sc">:</span><span class="fu">factor</span>(mo) <span class="sc">+</span> tn_load<span class="sc">:</span><span class="fu">factor</span>(bay_segment)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Cumulative Lags</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Individual Lags</a></li></ul>
-<div class="tab-content">
-<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -194,29 +186,6 @@ window.Quarto = {
 </div>
 </div>
 </div>
-</div>
-<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-5-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="explore_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-6-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="explore_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></a></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
 </section>
 <section id="otb-only-model" class="level2">
 <h2 class="anchored" data-anchor-id="otb-only-model">OTB Only Model</h2>
@@ -226,18 +195,32 @@ window.Quarto = {
 \text{chla}_{t} = \alpha_{t} + \beta \left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right)
 \]</span></p>
 <p>where <span class="math inline">\(\text{chla}_{t}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span>, <span class="math inline">\(\alpha_{t}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span>, <span class="math inline">\(\beta\)</span> is the coefficient for the cumulative load term, and <span class="math inline">\(L_{t - i}\)</span> is the cumulative nitrogen load evaluated at different lags from <span class="math inline">\(I_0\)</span> for the present month to <span class="math inline">\(I_n\)</span> months.</p>
-<p>The individaul lag model is specified as: <span class="math display">\[
-\text{chla}_{t} = \alpha_{t} + \beta L_{I_n}
-\]</span></p>
-<p>where <span class="math inline">\(\text{chla}_{t}\)</span> is the chlorophyll-a concentration at month <span class="math inline">\(t\)</span>, <span class="math inline">\(\alpha_{t}\)</span> is the intercept term that varies by <span class="math inline">\(t\)</span>, <span class="math inline">\(\beta\)</span> is the coefficient for the individual load term, and <span class="math inline">\(L_{I_n}\)</span> is the individual nitrogen load evaluated at different monthly <span class="math inline">\(I_n\)</span> lags.</p>
-<p>Both models are run with the following linear model structure in R, where the <code>tn_load</code> variable is either the cumulative or individual lag load for different <span class="math inline">\(n\)</span> lags.</p>
+<p>Models are run with the following linear model structure in R, where the <code>tn_load</code> variable is the cumulative lag load for different <span class="math inline">\(n\)</span> lags.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>chla <span class="sc">~</span> <span class="fu">factor</span>(mo) <span class="sc">+</span> tn_load</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Cumulative Lags</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Individual Lags</a></li></ul>
-<div class="tab-content">
-<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-6-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="explore_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-7-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="explore_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="assimilative-capacity-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="assimilative-capacity-analysis">Assimilative Capacity Analysis</h2>
+<p>The cumulative lag model with a 3-month lag was chosen for the assimilative capacity analysis based on the results above and previous work by Janicki and Wade (1996).</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -247,6 +230,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
+<p>The annual average observed and predicted chlorophyll-a concentrations are compared for Old Tampa Bay below.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -256,8 +240,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-</div>
-<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>The assimilative capacity analysis involves simulating various nitrogen load reduction scenarios and predicting the resulting chlorophyll-a concentrations using the developed models. Monthly loads are reduced by fractions ranging from 0% to 100% in 5% increments. The models are then used to predict chlorophyll-a concentrations under each load reduction scenario.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -266,55 +249,10 @@ window.Quarto = {
 </figure>
 </div>
 </div>
-</div>
-<div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-11-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="explore_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></a></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="assimilative-capacity-analysis" class="level2">
-<h2 class="anchored" data-anchor-id="assimilative-capacity-analysis">Assimilative Capacity Analysis</h2>
-<p>The cumulative lag model with a 3-month lag was chosen for the assimilative capacity analysis based on the results above and previous work by Janicki and Wade (1996). Separate models were used for the periods before and after 2010 to account for potential changes in factors driving chlorophyll-a concentration over time.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-12-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="explore_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<p>The annual average observed and predicted chlorophyll-a concentrations are compared to the target of 9.3 µg/L for Old Tampa Bay below.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-13-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="explore_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></a></p>
-</figure>
-</div>
-</div>
-</div>
-<p>The assimilative capacity analysis involves simulating various nitrogen load reduction scenarios and predicting the resulting chlorophyll-a concentrations using the developed models. Monthly loads are reduced by fractions ranging from 0% to 100% in 5% increments. The models are then used to predict chlorophyll-a concentrations under each load reduction scenario for both time periods (before and after 2010).</p>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-14-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="explore_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></a></p>
-</figure>
-</div>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-14-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="explore_files/figure-html/unnamed-chunk-14-2.png" class="img-fluid figure-img" width="672"></a></p>
+<p><a href="explore_files/figure-html/unnamed-chunk-10-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="explore_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -324,24 +262,24 @@ window.Quarto = {
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-15-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="explore_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></a></p>
+<p><a href="explore_files/figure-html/unnamed-chunk-11-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="explore_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-15-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="explore_files/figure-html/unnamed-chunk-15-2.png" class="img-fluid figure-img" width="672"></a></p>
+<p><a href="explore_files/figure-html/unnamed-chunk-11-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="explore_files/figure-html/unnamed-chunk-11-2.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
 </div>
-<p>The average response of chlorophyll-a to nitrogen load changes was then estimated for each time period by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario. The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario. The dashed red line indicates the target chlorophyll-a concentration of 9.3 µg/L. The arrows indicate the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration for each time period based on linear interpolation of the average response curves. The estimated loads needed to achieve 9.3 µg/L chlorophyll-a are 598 tons/year before 2010 and 658 tons/year for 2010 and after.</p>
+<p>The average response of chlorophyll-a to nitrogen load changes was then estimated by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario. The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario. The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L. The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are 471 tons/year.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-17-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="explore_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></a></p>
+<p><a href="explore_files/figure-html/unnamed-chunk-13-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="explore_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -354,7 +292,7 @@ window.Quarto = {
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-18-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img src="explore_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></a></p>
+<p><a href="explore_files/figure-html/unnamed-chunk-14-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="explore_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -364,7 +302,7 @@ window.Quarto = {
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><a href="explore_files/figure-html/unnamed-chunk-19-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="explore_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></a></p>
+<p><a href="explore_files/figure-html/unnamed-chunk-15-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="explore_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -373,11 +311,11 @@ window.Quarto = {
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code> var     vif             
- sal     1.07184807857186
- temp    1.50867898743071
- tn_load 1.59373501251331
+ sal     1.05485641969309
+ temp    1.59961720274526
+ tn_load 1.66738366331872
 
-All variables have VIF &lt; 10, max VIF 1.59 </code></pre>
+All variables have VIF &lt; 10, max VIF 1.67 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "sal"     "temp"    "tn_load"</code></pre>
