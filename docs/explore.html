@@ -121,6 +121,7 @@ window.Quarto = {
   <li><a href="#otb-only-model" id="toc-otb-only-model" class="nav-link" data-scroll-target="#otb-only-model">OTB Only Model</a></li>
   <li><a href="#assimilative-capacity-analysis" id="toc-assimilative-capacity-analysis" class="nav-link" data-scroll-target="#assimilative-capacity-analysis">Assimilative Capacity Analysis</a></li>
   <li><a href="#log-models-with-additional-predictors" id="toc-log-models-with-additional-predictors" class="nav-link" data-scroll-target="#log-models-with-additional-predictors">Log-models with additional predictors</a></li>
+  <li><a href="#load-response-by-year" id="toc-load-response-by-year" class="nav-link" data-scroll-target="#load-response-by-year">Load response by year</a></li>
   </ul>
 </nav>
 </div>
@@ -388,6 +389,87 @@ log_{10}\text{chla}_{t} = \alpha_{t} + \beta_1 log_{10}\left( \Sigma_{i = I_0}^{
 <div>
 <figure class="figure">
 <p><a href="explore_files/figure-html/unnamed-chunk-23-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21"><img src="explore_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="load-response-by-year" class="level2">
+<h2 class="anchored" data-anchor-id="load-response-by-year">Load response by year</h2>
+<p>A final model structure was evaluated that let the load response vary by year. Only year and load were used as the predictors (month was removed).</p>
+<p><span class="math display">\[
+\text{chla}_{t} = \beta_1 \left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right) + \beta_2 year_v \left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right)
+\]</span></p>
+<p>where <span class="math inline">\(year_v \left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right)\)</span> is an interaction term between year (as a factor) and the cumulative load evaluated at different lags from <span class="math inline">\(I_0\)</span> for the present month to <span class="math inline">\(I_n\)</span> months.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-24-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-22"><img src="explore_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The monthly observed and predicted chlorophyll-a concentrations are compared for Old Tampa Bay below.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-25-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-23"><img src="explore_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The annual average observed and predicted chlorophyll-a concentrations are compared for Old Tampa Bay below.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-26-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-24"><img src="explore_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Monthly and annual model predictions are then generated for various nitrogen load reduction scenarios using the new log-model with additional predictors. Monthly loads are reduced by fractions ranging from 0% to 100% in 5% increments. The models are then used to predict chlorophyll-a concentrations under each load reduction scenario.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-27-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-25"><img src="explore_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-27-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-26"><img src="explore_files/figure-html/unnamed-chunk-27-2.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Monthly model predictions are then aggregated to annual average predicted chlorophyll-a and total nitrogen loads for each load reduction scenario.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-28-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-27"><img src="explore_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-28-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-28"><img src="explore_files/figure-html/unnamed-chunk-28-2.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the load reduction scenarios, the average response of chlorophyll-a to nitrogen load changes was then estimated by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario. The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario. The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L. The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are 526 tons/year.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-30-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-29"><img src="explore_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
