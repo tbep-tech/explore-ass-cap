@@ -482,9 +482,20 @@ newdat <- epcdata |>
   mutate(
     date = make_date(yr, mo, day = 1)
   ) |>
+  mutate(
+    sal = mean(
+      c(Sal_Top_ppth, Sal_Mid_ppth, Sal_Bottom_ppth),
+      na.rm = T
+    ),
+    temp = mean(
+      c(Temp_Water_Top_degC, Temp_Water_Mid_degC, Temp_Water_Bottom_degC),
+      na.rm = T
+    ),
+    .by = c(epchc_station, date)
+  ) |>
   summarise(
-    sal = mean(Sal_Top_ppth, na.rm = T),
-    temp = mean(Temp_Water_Top_degC, na.rm = T),
+    sal = mean(sal, na.rm = T),
+    temp = mean(temp, na.rm = T),
     .by = c(bay_segment, date, yr, mo)
   ) |>
   inner_join(wqmo, by = c('bay_segment', 'date', 'yr', 'mo')) |>
