@@ -410,7 +410,45 @@ addlns <- tibble(
 )
 ```
 
-The average response of chlorophyll-a to nitrogen load changes was then estimated by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario.  The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L.  The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are `r round(asscap, 0)` tons/year.
+The average response of chlorophyll-a to nitrogen load changes was then estimated by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario.  
+
+```{r}
+#| layout-ncol: 2
+#| fig-height: 3
+toplo4 <- toplo3 |>
+  crossing(
+    yr = toplo2$yr
+  )
+
+ggplot(toplo4, aes(x = yr, y = tn_load, group = redscn)) +
+  geom_line(aes(color = redscn)) +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'D') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Mean Total Nitrogen Loads by Load Reduction Scenarios',
+    y = 'tons/year',
+    x = NULL
+  )
+
+ggplot(toplo4, aes(x = yr, y = avechl, group = redscn)) +
+  geom_line(aes(color = redscn)) +
+  geom_hline(yintercept = 8.5, linetype = 'dashed', color = 'red') +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'C') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Mean Predicted Chlorophyll-a by Load Reduction Scenarios',
+    y = 'µg/L',
+    x = NULL
+  )
+```
+
+The plot below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L.  The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are `r round(asscap, 0)` tons/year.
 
 ```{r}
 ggplot(toplo3, aes(x = tn_load, y = avechl)) +
@@ -822,7 +860,45 @@ addlns <- tibble(
 )
 ```
 
-From the load reduction scenarios, the average response of chlorophyll-a to nitrogen load changes was then estimated by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario.  The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L.  The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are `r round(asscap, 0)` tons/year.
+From the load reduction scenarios, the average response of chlorophyll-a to nitrogen load changes was then estimated by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario.  
+
+```{r}
+#| layout-ncol: 2
+#| fig-height: 3
+toplo4 <- toplo3 |>
+  crossing(
+    yr = toplo2$yr
+  )
+
+ggplot(toplo4, aes(x = yr, y = tn_load, group = redscn)) +
+  geom_line(aes(color = redscn)) +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'D') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Mean Total Nitrogen Loads by Load Reduction Scenarios',
+    y = 'tons/year',
+    x = NULL
+  )
+
+ggplot(toplo4, aes(x = yr, y = avechl, group = redscn)) +
+  geom_line(aes(color = redscn)) +
+  geom_hline(yintercept = 8.5, linetype = 'dashed', color = 'red') +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'C') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Mean Predicted Chlorophyll-a by Load Reduction Scenarios',
+    y = 'µg/L',
+    x = NULL
+  )
+```
+
+The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L.  The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are `r round(asscap, 0)` tons/year.
 
 ```{r}
 ggplot(toplo3, aes(x = tn_load, y = avechl)) +
@@ -1159,7 +1235,45 @@ addlns <- tibble(
 )
 ```
 
-From the load reduction scenarios, the average response of chlorophyll-a to nitrogen load changes was then estimated by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario.  The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L.  The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are `r round(asscap, 0)` tons/year.
+From the load reduction scenarios, the average response of chlorophyll-a to nitrogen load changes was then estimated by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario. 
+
+```{r}
+#| layout-ncol: 2
+#| fig-height: 3
+toplo4 <- toplo3 |>
+  crossing(
+    yr = toplo2$yr
+  )
+
+ggplot(toplo4, aes(x = yr, y = tn_load, group = redscn)) +
+  geom_line(aes(color = redscn)) +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'D') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Mean Total Nitrogen Loads by Load Reduction Scenarios',
+    y = 'tons/year',
+    x = NULL
+  )
+
+ggplot(toplo4, aes(x = yr, y = avechl, group = redscn)) +
+  geom_line(aes(color = redscn)) +
+  geom_hline(yintercept = 8.5, linetype = 'dashed', color = 'red') +
+  scale_color_viridis_c(name = 'Load Reduction\nFraction', option = 'C') +
+  theme_minimal() +
+  theme(
+    legend.position = 'bottom'
+  ) +
+  labs(
+    title = 'Mean Predicted Chlorophyll-a by Load Reduction Scenarios',
+    y = 'µg/L',
+    x = NULL
+  )
+```
+
+ The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L.  The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are `r round(asscap, 0)` tons/year.
 
 ```{r}
 ggplot(toplo3, aes(x = tn_load, y = avechl)) +
