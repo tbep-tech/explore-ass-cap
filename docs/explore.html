@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Tampa Bay Estuary Program">
-<meta name="dcterms.date" content="2026-01-13">
+<meta name="dcterms.date" content="2026-01-14">
 
 <title>Exploring the Assimilative Capacity of Old Tampa Bay</title>
 <style>
@@ -117,11 +117,18 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#original-model-all-bay-segments" id="toc-original-model-all-bay-segments" class="nav-link active" data-scroll-target="#original-model-all-bay-segments">Original Model, All Bay Segments</a></li>
-  <li><a href="#otb-only-model" id="toc-otb-only-model" class="nav-link" data-scroll-target="#otb-only-model">OTB Only Model</a></li>
-  <li><a href="#assimilative-capacity-analysis" id="toc-assimilative-capacity-analysis" class="nav-link" data-scroll-target="#assimilative-capacity-analysis">Assimilative Capacity Analysis</a></li>
-  <li><a href="#log-models-with-additional-predictors" id="toc-log-models-with-additional-predictors" class="nav-link" data-scroll-target="#log-models-with-additional-predictors">Log-models with additional predictors</a></li>
-  <li><a href="#load-response-by-year" id="toc-load-response-by-year" class="nav-link" data-scroll-target="#load-response-by-year">Load response by year</a></li>
+  <li><a href="#premise" id="toc-premise" class="nav-link active" data-scroll-target="#premise">Premise</a></li>
+  <li><a href="#model-1-original-all-bay-segments" id="toc-model-1-original-all-bay-segments" class="nav-link" data-scroll-target="#model-1-original-all-bay-segments">Model 1 (Original), All Bay Segments</a></li>
+  <li><a href="#model-1-otb-only" id="toc-model-1-otb-only" class="nav-link" data-scroll-target="#model-1-otb-only">Model 1: OTB Only</a></li>
+  <li><a href="#model-1-assimilative-capacity-analysis" id="toc-model-1-assimilative-capacity-analysis" class="nav-link" data-scroll-target="#model-1-assimilative-capacity-analysis">Model 1: Assimilative Capacity Analysis</a></li>
+  <li><a href="#model-2-log-model-with-additional-predictors" id="toc-model-2-log-model-with-additional-predictors" class="nav-link" data-scroll-target="#model-2-log-model-with-additional-predictors">Model 2: Log-Model with Additional Predictors</a></li>
+  <li><a href="#model-3-load-response-by-year" id="toc-model-3-load-response-by-year" class="nav-link" data-scroll-target="#model-3-load-response-by-year">Model 3: Load Response by Year</a></li>
+  <li><a href="#otb-pinellas-county-data" id="toc-otb-pinellas-county-data" class="nav-link" data-scroll-target="#otb-pinellas-county-data">OTB Pinellas County Data</a>
+  <ul class="collapse">
+  <li><a href="#model-1" id="toc-model-1" class="nav-link" data-scroll-target="#model-1">Model 1</a></li>
+  <li><a href="#model-2" id="toc-model-2" class="nav-link" data-scroll-target="#model-2">Model 2</a></li>
+  <li><a href="#model-3" id="toc-model-3" class="nav-link" data-scroll-target="#model-3">Model 3</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -146,7 +153,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">January 13, 2026</p>
+      <p class="date">January 14, 2026</p>
     </div>
   </div>
   
@@ -158,8 +165,16 @@ window.Quarto = {
 </header>
 
 
-<section id="original-model-all-bay-segments" class="level2">
-<h2 class="anchored" data-anchor-id="original-model-all-bay-segments">Original Model, All Bay Segments</h2>
+<section id="premise" class="level2">
+<h2 class="anchored" data-anchor-id="premise">Premise</h2>
+<ul>
+<li>Keep it simple!</li>
+<li>Evaluate prior models with additional years of data, slight tweaks to model structure</li>
+<li>Build off evidence for assimilative capacity studies (task reports <a href="https://drive.google.com/file/d/1IfVUTLE20wzVgzULuyeRGWapEFT3DhQ0/view?usp=drive_link">1</a>, <a href="https://drive.google.com/file/d/12xYfSs-4bxhLa1ZVQbmhQSv5Jo4Jf-oY/view?usp=sharing">2</a>, <a href="https://drive.google.com/file/d/1uVeMIpSylz1Mull6WMwVDc7KVInzosqy/view?usp=sharing">3</a>)</li>
+</ul>
+</section>
+<section id="model-1-original-all-bay-segments" class="level2">
+<h2 class="anchored" data-anchor-id="model-1-original-all-bay-segments">Model 1 (Original), All Bay Segments</h2>
 <p>The cumulative lag model from <a href="https://drive.google.com/file/d/1kZkvuprvsMyN9nPS5PHYvXHyo1KQxKTr/view">Janicki and Wade 1996</a> is specified as:</p>
 <p><span class="math display">\[
 \text{chla}_{t, s} = \alpha_{t, s} + \beta_s \left( \Sigma_{i = I_0}^{I_n} L_{t - i, s} \right)
@@ -188,8 +203,8 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="otb-only-model" class="level2">
-<h2 class="anchored" data-anchor-id="otb-only-model">OTB Only Model</h2>
+<section id="model-1-otb-only" class="level2">
+<h2 class="anchored" data-anchor-id="model-1-otb-only">Model 1: OTB Only</h2>
 <p>The models are the same as above except the bay segment term is removed since only OTB is being modeled.</p>
 <p>The cumulative lag model from is specified as:</p>
 <p><span class="math display">\[
@@ -219,8 +234,8 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="assimilative-capacity-analysis" class="level2">
-<h2 class="anchored" data-anchor-id="assimilative-capacity-analysis">Assimilative Capacity Analysis</h2>
+<section id="model-1-assimilative-capacity-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="model-1-assimilative-capacity-analysis">Model 1: Assimilative Capacity Analysis</h2>
 <p>The cumulative lag model with a 3-month lag was chosen for the assimilative capacity analysis based on the results above and previous work by Janicki and Wade (1996).</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -286,7 +301,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>The plot below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario. The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L. The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are 471 tons/year.</p>
+<p>The plot below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario. The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L. The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are 466 tons/year.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -297,8 +312,8 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="log-models-with-additional-predictors" class="level2">
-<h2 class="anchored" data-anchor-id="log-models-with-additional-predictors">Log-models with additional predictors</h2>
+<section id="model-2-log-model-with-additional-predictors" class="level2">
+<h2 class="anchored" data-anchor-id="model-2-log-model-with-additional-predictors">Model 2: Log-Model with Additional Predictors</h2>
 <p>The above models used to predict the assimilative capacity of Old Tampa Bay, particularly for the period after 2010, likely provide an overestimate of how much loading the bay segment can assimilate. This is evident by evaluating the residual patterns - the model does not capture extreme values. Results could be improved by modeling an inherently log-normal response variable and including additional predictors to provide a more accurate estimate of how nitrogen load influences chlorophyll-a.</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -405,7 +420,7 @@ log_{10}\text{chla}_{t} = \alpha_{t} + \beta_1 log_{10}\left( \Sigma_{i = I_0}^{
 </div>
 </div>
 </div>
-<p>The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario. The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L. The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are 447 tons/year.</p>
+<p>The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario. The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L. The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are 439 tons/year.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -416,8 +431,8 @@ log_{10}\text{chla}_{t} = \alpha_{t} + \beta_1 log_{10}\left( \Sigma_{i = I_0}^{
 </div>
 </div>
 </section>
-<section id="load-response-by-year" class="level2">
-<h2 class="anchored" data-anchor-id="load-response-by-year">Load response by year</h2>
+<section id="model-3-load-response-by-year" class="level2">
+<h2 class="anchored" data-anchor-id="model-3-load-response-by-year">Model 3: Load Response by Year</h2>
 <p>A final model structure was evaluated that let the load response vary by year. Only year and load were used as the predictors (month was removed).</p>
 <p><span class="math display">\[
 \text{chla}_{t} = \beta_1 \left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right) + \beta_2 year_v \left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right)
@@ -497,7 +512,7 @@ log_{10}\text{chla}_{t} = \alpha_{t} + \beta_1 log_{10}\left( \Sigma_{i = I_0}^{
 </div>
 </div>
 </div>
-<p>The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario. The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L. The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are 526 tons/year.</p>
+<p>The plot below shows each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario. The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L. The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are 527 tons/year.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -507,6 +522,113 @@ log_{10}\text{chla}_{t} = \alpha_{t} + \beta_1 log_{10}\left( \Sigma_{i = I_0}^{
 </div>
 </div>
 </div>
+</section>
+<section id="otb-pinellas-county-data" class="level2">
+<h2 class="anchored" data-anchor-id="otb-pinellas-county-data">OTB Pinellas County Data</h2>
+<p>The above analyses for Old Tampa Bay were repeated using monitoring data from Pinellas County. Chlorophyll data (corrected for Pheophytin) are availale from 2003 to present. The three models were evaluated to assess the potential loading associated with 8.5 <span class="math inline">\(\mu\)</span>g/L of chlorophyll. Only relevant plots and model summaries are shown below.</p>
+<section id="model-1" class="level3">
+<h3 class="anchored" data-anchor-id="model-1">Model 1</h3>
+<p><span class="math display">\[
+\text{chla}_{t} = \alpha_{t} + \beta \left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right)
+\]</span></p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-34-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-36"><img src="explore_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-35-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-37"><img src="explore_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Estimated loaded need to achieve 8.5 <span class="math inline">\(\mu\)</span>g/L chlorophyll-a are 466 tons/year.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-37-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-38"><img src="explore_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="model-2" class="level3">
+<h3 class="anchored" data-anchor-id="model-2">Model 2</h3>
+<p><span class="math display">\[
+log_{10}\text{chla}_{t} = \alpha_{t} + \beta_1 log_{10}\left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right) + \beta_2 \text{temp}_{t}
+\]</span></p>
+<p>Note: Salinity not included in this model.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-38-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-39"><img src="explore_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-39-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-40"><img src="explore_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Estimated loaded need to achieve 8.5 <span class="math inline">\(\mu\)</span>g/L chlorophyll-a are 464 tons/year.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-41-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-41"><img src="explore_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="model-3" class="level3">
+<h3 class="anchored" data-anchor-id="model-3">Model 3</h3>
+<p><span class="math display">\[
+\text{chla}_{t} = \beta_1 \left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right) + \beta_2 year_v \left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right)
+\]</span></p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-42-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-42"><img src="explore_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-43-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-43"><img src="explore_files/figure-html/unnamed-chunk-43-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Estimated loaded need to achieve 8.5 <span class="math inline">\(\mu\)</span>g/L chlorophyll-a are 531 tons/year.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="explore_files/figure-html/unnamed-chunk-45-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-44"><img src="explore_files/figure-html/unnamed-chunk-45-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 
 </main>
