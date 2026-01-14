@@ -127,8 +127,8 @@ pintomod <- tomod |>
 ## Premise
 
 * Keep it simple!
-* Evaluate prior models with additional years of data, slight tweaks to model structure
-* Build off evidence for assimilative capacity studies (task reports [1](https://drive.google.com/file/d/1IfVUTLE20wzVgzULuyeRGWapEFT3DhQ0/view?usp=drive_link), [2](https://drive.google.com/file/d/12xYfSs-4bxhLa1ZVQbmhQSv5Jo4Jf-oY/view?usp=sharing), [3](https://drive.google.com/file/d/1uVeMIpSylz1Mull6WMwVDc7KVInzosqy/view?usp=sharing))
+* Evaluate prior models with additional years of data, slight tweaks to original model structure
+* Build off evidence for assimilative capacity studies (task reports [1](https://drive.google.com/file/d/1IfVUTLE20wzVgzULuyeRGWapEFT3DhQ0/view?usp=drive_link), [2](https://drive.google.com/file/d/12xYfSs-4bxhLa1ZVQbmhQSv5Jo4Jf-oY/view?usp=sharing), [3](https://drive.google.com/file/d/1uVeMIpSylz1Mull6WMwVDc7KVInzosqy/view?usp=sharing)) and historical work
 
 ## Model 1 (Original), All Bay Segments 
 
@@ -165,9 +165,9 @@ rsqplo_fun(mod)
 
 ## Model 1: OTB Only
 
-The models are the same as above except the bay segment term is removed since only OTB is being modeled.
+The model is the same as above except the bay segment term is removed since only OTB is evaluated.
 
-The cumulative lag model from is specified as:
+The cumulative lag model form is specified as:
 
 $$
 \text{chla}_{t} = \alpha_{t} + \beta \left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right)
@@ -213,7 +213,7 @@ The annual average observed and predicted chlorophyll-a concentrations are compa
 modprd_fun(toprdotb, 'yr')
 ```
 
-The assimilative capacity analysis involves simulating various nitrogen load reduction scenarios and predicting the resulting chlorophyll-a concentrations using the developed models. Monthly loads are reduced by fractions ranging from 0% to 100% in 5% increments. The models are then used to predict chlorophyll-a concentrations under each load reduction scenario.
+The assimilative capacity analysis involves simulating sequential nitrogen load reduction scenarios and predicting the resulting chlorophyll-a concentrations using the developed models. Monthly loads are reduced by fractions ranging from 5% to 100% in 5% increments. The models are then used to predict chlorophyll-a concentrations under each load reduction scenario.
 
 ```{r}
 #| fig-height: 3
@@ -223,7 +223,7 @@ redscn_plo(redscn, 'mo', 'tn')
 redscn_plo(redscn, 'mo', 'chla')
 ```
 
-Monthly  model predictions are then aggregated to annual average predicted chlorophyll-a and total nitrogen loads for each load reduction scenario.
+Monthly total nitrogen loads are then summed for the annual nitrogen loads and model predictions are aggregated to the annual average predicted chlorophyll-a concentrations for each load reduction scenario.
 
 ```{r}
 #| fig-height: 3
@@ -233,10 +233,10 @@ redscn_plo(redscn, 'yr', 'chla')
 
 ```{r}
 asscapdata <- asscapdata_fun(redscn)
-asscap <- asscap_fun(asscapdata)
+asscap1 <- asscap_fun(asscapdata)
 ```
 
-The average response of chlorophyll-a to nitrogen load changes was then estimated by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario.  
+Annual load estimates and chlorophyll-a predictions for each load reduction scenario are then averaged across the years.
 
 ```{r}
 #| layout-ncol: 2
@@ -245,10 +245,10 @@ redscnaggplo_fun(asscapdata, redscn, 'tn')
 redscnaggplo_fun(asscapdata, redscn, 'chla')
 ```
 
-The plot below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L.  The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are `r round(asscap, 0)` tons/year.
+Plotting these averages against each other can demonstrate an expected response of chlorophyll to load changes for the model.  The plot below shows each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L.  The arrow indicates the estimated nitrogen load needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated load needed to achieve 8.5 µg/L chlorophyll-a is `r round(asscap1, 0)` tons/year.
 
 ```{r}
-asscap_plo(asscapdata, asscap)
+asscap_plo(asscapdata, asscap1)
 ```
 
 ## Model 2: Log-Model with Additional Predictors
@@ -268,7 +268,7 @@ ggplot(data.frame(residuals = residuals(mod)), aes(sample = residuals)) +
   theme_minimal()
 ```
 
-To address this issue, an additional model was developed using log-transformed chlorophyll-a as the response variable and additional predictors, including salinity and temperature. 
+To address this issue, an additional model was developed using log-transformed chlorophyll-a as the response variable, log-transformed loading valuse, and additional predictors, including salinity and temperature. 
 
 ```{r}
 toplo <- tomodotb |>
@@ -300,7 +300,7 @@ $$
 log_{10}\text{chla}_{t} = \alpha_{t} + \beta_1 log_{10}\left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right) + \beta_2 \text{sal}_{t} + \beta_3 \text{temp}_{t}
 $$
 
-where the coefficients $\beta_2$ and $\beta_3$ represent the influence of salinity and temperature on chlorophyll-a concentrations.  Chlorophyll is modelled using a log-normal distribution to better capture extreme values and loading is also log-transformed. Below shows the explained deviance (pseudo-r-squared) for each cumulative lag model.
+where the coefficients $\beta_2$ and $\beta_3$ represent the influence of salinity and temperature on chlorophyll-a concentrations.  Chlorophyll is modelled using a log-normal distribution (using a GLM with a log-link function) to better capture extreme values and loading is also log-transformed. Below shows the explained deviance (pseudo-r-squared for GLMs) for each cumulative lag model.
 
 ```{r}
 #| fig-height: 2
@@ -312,7 +312,7 @@ mod <- rsqmod_fun(
 rsqplo_fun(mod)
 ```
 
-The monthly observed and predicted chlorophyll-a concentrations are compared for Old Tampa Bay below.
+The model with a lag of 3 months for loading was used below. The monthly observed and predicted chlorophyll-a concentrations are compared for Old Tampa Bay below.
 
 ```{r}
 toprdotb <- mod_fun(
@@ -329,7 +329,7 @@ The annual average observed and predicted chlorophyll-a concentrations are compa
 modprd_fun(toprdotb, 'yr')
 ```
 
-Monthly and annual model predictions are then generated for various nitrogen load reduction scenarios using the new log-model with additional predictors. Monthly loads are reduced by fractions ranging from 0% to 100% in 5% increments. The models are then used to predict chlorophyll-a concentrations under each load reduction scenario.  __Salinity and temperature are held constant at their monthly average values for each month across the entire time series.__
+Monthly and annual model predictions are then generated for various nitrogen load reduction scenarios using the new log-model with additional predictors. Monthly loads are reduced by fractions ranging from 5% to 100% in 5% increments. The models are then used to predict chlorophyll-a concentrations under each load reduction scenario.
 
 ```{r}
 #| fig-height: 3
@@ -338,7 +338,7 @@ redscn_plo(redscn, 'mo', 'tn')
 redscn_plo(redscn, 'mo', 'chla')
 ```
 
-Monthly  model predictions are then aggregated to annual average predicted chlorophyll-a and total nitrogen loads for each load reduction scenario.
+Monthly total nitrogen loads are then summed for the annual nitrogen loads and model predictions are aggregated to the annual average predicted chlorophyll-a concentration for each load reduction scenario.
 
 ```{r}
 #| fig-height: 3
@@ -348,10 +348,10 @@ redscn_plo(redscn, 'yr', 'chla')
 
 ```{r}
 asscapdata <- asscapdata_fun(redscn)
-asscap <- asscap_fun(asscapdata)
+asscap2 <- asscap_fun(asscapdata)
 ```
 
-From the load reduction scenarios, the average response of chlorophyll-a to nitrogen load changes was then estimated by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario.  
+Annual load estimates and chlorophyll-a predictions for each load reduction scenario are then averaged across the years. 
 
 ```{r}
 #| layout-ncol: 2
@@ -360,10 +360,10 @@ redscnaggplo_fun(asscapdata, redscn, 'tn')
 redscnaggplo_fun(asscapdata, redscn, 'chla')
 ```
 
-The plots below show each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L.  The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are `r round(asscap, 0)` tons/year.
+Plotting these averages against each other can demonstrate an expected response of chlorophyll to load changes for the model.  The plot below shows each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L.  The arrow indicates the estimated nitrogen load needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated load needed to achieve 8.5 µg/L chlorophyll-a is `r round(asscap2, 0)` tons/year.
 
 ```{r}
-asscap_plo(asscapdata, asscap)
+asscap_plo(asscapdata, asscap2)
 ```
 
 ## Model 3: Load Response by Year
@@ -382,7 +382,7 @@ mod <- rsqmod_fun(tomodotb, 'chla ~ tn_load + factor(yr):tn_load')
 rsqplo_fun(mod)
 ```
 
-The monthly observed and predicted chlorophyll-a concentrations are compared for Old Tampa Bay below.
+The model with a lag of 3 months for loading was used below. The monthly observed and predicted chlorophyll-a concentrations are compared for Old Tampa Bay below.
 
 ```{r}
 toprdotb <- mod_fun(tomodotb, 'chla ~ `Lag 3` + factor(yr):`Lag 3`')
@@ -395,7 +395,7 @@ The annual average observed and predicted chlorophyll-a concentrations are compa
 modprd_fun(toprdotb, 'yr')
 ```
 
-Monthly and annual model predictions are then generated for various nitrogen load reduction scenarios using the new log-model with additional predictors. Monthly loads are reduced by fractions ranging from 0% to 100% in 5% increments. The models are then used to predict chlorophyll-a concentrations under each load reduction scenario.
+Monthly and annual model predictions are then generated for various nitrogen load reduction scenarios using the new log-model with additional predictors. Monthly loads are reduced by fractions ranging from 5% to 100% in 5% increments. The models are then used to predict chlorophyll-a concentrations under each load reduction scenario.
 
 ```{r}
 #| fig-height: 3
@@ -404,7 +404,7 @@ redscn_plo(redscn, 'mo', 'tn')
 redscn_plo(redscn, 'mo', 'chla')
 ```
 
-Monthly  model predictions are then aggregated to annual average predicted chlorophyll-a and total nitrogen loads for each load reduction scenario.
+Monthly total nitrogen loads are then summed for the annual nitrogen loads and model predictions are aggregated to the annual average predicted chlorophyll-a concentrations for each load reduction scenario.
 
 ```{r}
 #| fig-height: 3
@@ -414,10 +414,10 @@ redscn_plo(redscn, 'yr', 'chla')
 
 ```{r}
 asscapdata <- asscapdata_fun(redscn)
-asscap <- asscap_fun(asscapdata)
+asscap3 <- asscap_fun(asscapdata)
 ```
 
-From the load reduction scenarios, the average response of chlorophyll-a to nitrogen load changes was then estimated by taking the average of the annual chlorophyll predictions and the average load estimates for each reduction scenario. 
+Annual load estimates and chlorophyll-a predictions for each load reduction scenario are then averaged across the years.
 
 ```{r}
 #| layout-ncol: 2
@@ -426,15 +426,15 @@ redscnaggplo_fun(asscapdata, redscn, 'tn')
 redscnaggplo_fun(asscapdata, redscn, 'chla')
 ```
 
- The plot below shows each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L.  The arrow indicates the estimated nitrogen load reductions needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated loads needed to achieve 8.5 µg/L chlorophyll-a are `r round(asscap, 0)` tons/year.
+Plotting these averages against each other can demonstrate an expected response of chlorophyll to load changes for the model.  The plot below shows each point as the average predicted chlorophyll-a versus the average total nitrogen load for each load reduction scenario.  The dashed red line indicates the target chlorophyll-a concentration of 8.5 µg/L.  The arrow indicates the estimated nitrogen load needed to achieve the target chlorophyll-a concentration based on linear interpolation of the average response curves. The estimated load needed to achieve 8.5 µg/L chlorophyll-a is `r round(asscap3, 0)` tons/year.
 
 ```{r}
-asscap_plo(asscapdata, asscap)
+asscap_plo(asscapdata, asscap3)
 ```
 
 ## OTB Pinellas County Data
 
-The above analyses for Old Tampa Bay were repeated using monitoring data from Pinellas County.  Chlorophyll data (corrected for Pheophytin) are availale from 2003 to present.  The three models were evaluated to assess the potential loading associated with 8.5 $\mu$g/L of chlorophyll.  Only relevant plots and model summaries are shown below.
+The above analyses for Old Tampa Bay were repeated using monitoring data from Pinellas County.  Chlorophyll-a data (corrected for Pheophytin) are available from 2003 to present for the western side of Old Tampa Bay.  The three models were evaluated to assess the potential loading associated with 8.5 $\mu$g/L of chlorophyll following similar methods as above.  Only relevant plots and model summaries are shown below.
 
 ### Model 1
 
@@ -456,13 +456,13 @@ modprd_fun(toprdotb, 'yr')
 ```{r}
 redscn <- redscn_fun(toprdotb)
 asscapdata <- asscapdata_fun(redscn)
-asscap <- asscap_fun(asscapdata)
+asscap4 <- asscap_fun(asscapdata)
 ```
 
-Estimated loaded need to achieve 8.5 $\mu$g/L chlorophyll-a are `r round(asscap, 0)` tons/year.
+The estimated load needed to achieve 8.5 $\mu$g/L chlorophyll-a is `r round(asscap4, 0)` tons/year.
 
 ```{r}
-asscap_plo(asscapdata, asscap)
+asscap_plo(asscapdata, asscap4)
 ```
 
 ### Model 2
@@ -471,7 +471,7 @@ $$
 log_{10}\text{chla}_{t} = \alpha_{t} + \beta_1 log_{10}\left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right) + \beta_2 \text{temp}_{t}
 $$
 
-Note: Salinity not included in this model. 
+Note: Salinity not included in this model due to poor assocation with loading. 
 
 ```{r}
 #| fig-height: 2
@@ -495,13 +495,13 @@ modprd_fun(toprdotb, 'yr')
 ```{r}
 redscn <- redscn_fun(toprdotb, type = 'response')
 asscapdata <- asscapdata_fun(redscn)
-asscap <- asscap_fun(asscapdata)
+asscap5 <- asscap_fun(asscapdata)
 ```
 
-Estimated loaded need to achieve 8.5 $\mu$g/L chlorophyll-a are `r round(asscap, 0)` tons/year.
+The estimated load needed to achieve 8.5 $\mu$g/L chlorophyll-a is `r round(asscap5, 0)` tons/year.
 
 ```{r}
-asscap_plo(asscapdata, asscap)
+asscap_plo(asscapdata, asscap5)
 ```
 
 ### Model 3
@@ -524,11 +524,30 @@ modprd_fun(toprdotb, 'yr')
 ```{r}
 redscn <- redscn_fun(toprdotb)
 asscapdata <- asscapdata_fun(redscn)
-asscap <- asscap_fun(asscapdata)
+asscap6 <- asscap_fun(asscapdata)
 ```
 
-Estimated loaded need to achieve 8.5 $\mu$g/L chlorophyll-a are `r round(asscap, 0)` tons/year.
+The estimated load needed to achieve 8.5 $\mu$g/L chlorophyll-a is `r round(asscap6, 0)` tons/year.
 
 ```{r}
-asscap_plo(asscapdata, asscap)
+asscap_plo(asscapdata, asscap6)
+```
+
+## Summary Table
+
+```{r}
+#| tbl-cap: "Estimated assimilative capacity to achieve 8.5 $\\mu$g/L in Old Tampa Bay, expressed as tons/year."
+totab <- tibble(
+  Dataset = rep(c('EPC', 'Pinellas'), each = 3),
+  Model = rep(
+    c('Model 1: Original', 'Model 2: Log, Addl Predictors', 'Model 3: By Year'),
+    2
+  ),
+  Est = c(asscap1, asscap2, asscap3, asscap4, asscap5, asscap6)
+) |>
+  pivot_wider(names_from = 'Model', values_from = 'Est')
+
+flextable::flextable(totab) |>
+  flextable::colformat_double(digits = 0) |>
+  flextable::autofit()
 ```

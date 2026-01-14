@@ -429,7 +429,7 @@ redscnaggplo_fun <- function(asscapdata, redscn, var = c('chla', 'tn')) {
         legend.position = 'bottom'
       ) +
       labs(
-        title = 'Mean Total Nitrogen Loads by Load Reduction Scenarios',
+        title = 'Mean Total Nitrogen Loads Across Years for Load Reduction Scenarios',
         y = 'tons/year',
         x = NULL
       )
@@ -445,7 +445,7 @@ redscnaggplo_fun <- function(asscapdata, redscn, var = c('chla', 'tn')) {
         legend.position = 'bottom'
       ) +
       labs(
-        title = 'Mean Predicted Chlorophyll-a by Load Reduction Scenarios',
+        title = 'Mean Predicted Chlorophyll-a Across Years for Load Reduction Scenarios',
         y = 'µg/L',
         x = NULL
       )
