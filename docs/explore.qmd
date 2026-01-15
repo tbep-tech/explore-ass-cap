@@ -471,7 +471,7 @@ $$
 log_{10}\text{chla}_{t} = \alpha_{t} + \beta_1 log_{10}\left( \Sigma_{i = I_0}^{I_n} L_{t - i} \right) + \beta_2 \text{temp}_{t}
 $$
 
-Note: Salinity not included in this model due to poor assocation with loading. 
+Note: Salinity excluded for better assocation of chlorophyll-a with loading. 
 
 ```{r}
 #| fig-height: 2
