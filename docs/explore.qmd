@@ -200,7 +200,7 @@ rsqplo_fun(mod)
 
 ## Model 1: Assimilative Capacity Analysis
 
-The cumulative lag model with a 3-month lag was chosen for the assimilative capacity analysis based on the results above and previous work by Janicki and Wade (1996).
+The cumulative lag model with a 3-month lag was chosen for the assimilative capacity analysis based on the results above and previous work by [Janicki and Wade 1996](https://drive.google.com/file/d/1kZkvuprvsMyN9nPS5PHYvXHyo1KQxKTr/view).
 
 ```{r}
 toprdotb <- mod_fun(tomodotb, 'chla ~ factor(mo) + `Lag 3`')
@@ -395,7 +395,7 @@ The annual average observed and predicted chlorophyll-a concentrations are compa
 modprd_fun(toprdotb, 'yr')
 ```
 
-Monthly and annual model predictions are then generated for various nitrogen load reduction scenarios using the new log-model with additional predictors. Monthly loads are reduced by fractions ranging from 5% to 100% in 5% increments. The models are then used to predict chlorophyll-a concentrations under each load reduction scenario.
+Monthly and annual model predictions are then generated for various nitrogen load reduction scenarios using the new model where the chlorophyll response to loading varies between years. Monthly loads are reduced by fractions ranging from 5% to 100% in 5% increments. The models are then used to predict chlorophyll-a concentrations under each load reduction scenario.
 
 ```{r}
 #| fig-height: 3
